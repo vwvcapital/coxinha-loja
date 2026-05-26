@@ -123,6 +123,42 @@ function copyTextToClipboard(value) {
   });
 }
 
+function showServerIpToast(content, status = 'success') {
+  const message = String(content ?? '').trim();
+  if (!message) return;
+
+  let toastElement = document.getElementById('server-ip-toast');
+  if (!toastElement) {
+    toastElement = document.createElement('div');
+    toastElement.id = 'server-ip-toast';
+    toastElement.className = 'server-ip-toast hidden';
+    toastElement.setAttribute('role', 'status');
+    toastElement.setAttribute('aria-live', 'polite');
+    document.body.appendChild(toastElement);
+  }
+
+  window.clearTimeout(toastElement.__hideTimer);
+  window.clearTimeout(toastElement.__removeTimer);
+  toastElement.textContent = message;
+  toastElement.dataset.status = status;
+  toastElement.dataset.state = 'reset';
+  toastElement.classList.remove('hidden');
+
+  void toastElement.offsetWidth;
+  toastElement.dataset.state = 'open';
+
+  const exitDuration = 220;
+  const totalDuration = 1500;
+  toastElement.__hideTimer = window.setTimeout(() => {
+    toastElement.dataset.state = 'closing';
+    toastElement.__removeTimer = window.setTimeout(() => {
+      if (toastElement.dataset.state !== 'closing') return;
+      toastElement.dataset.state = 'closed';
+      toastElement.classList.add('hidden');
+    }, exitDuration);
+  }, totalDuration - exitDuration);
+}
+
 function getServerIpDialog() {
   let dialog = document.getElementById('server-ip-dialog');
   if (dialog) return dialog;
@@ -241,14 +277,14 @@ function openServerIpDialog(javaIp = '', bedrockIp = '') {
       try {
         await copyTextToClipboard(value);
         button.setAttribute('data-copied', 'true');
-        toast.success(`IP ${label} copiado.`);
+        showServerIpToast(`IP ${label} copiado.`);
 
         setTimeout(() => {
           button.removeAttribute('data-copied');
         }, 1400);
       } catch (error) {
         console.error(error);
-        toast.error('Nao foi possivel copiar o IP.');
+        showServerIpToast('Nao foi possivel copiar o IP.', 'error');
       }
     });
   });
