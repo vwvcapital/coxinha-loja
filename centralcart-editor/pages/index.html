@@ -19,6 +19,7 @@
           </div>
 
           <div class="product-grid category-products">
+            <% assign category_product_remainder = packages.data.size | modulo: 2 %>
             <% for package in packages.data %>
               <% assign is_highlighted = widget.package_highlight.id == package.id %>
               <% assign modal_price = package.pricing.min | default: package.pricing.price %>
@@ -142,7 +143,7 @@
 
               <script type="application/json" data-package-fields="<%= package.id %>"><%= display_package.fields | json %></script>
 
-              <article class="product-card package-card<% if package_id_text == '557587' %> package-card-best-value<% endif %>" data-package-id="<%= package.id %>">
+              <article class="product-card package-card<% if package_id_text == '557587' %> package-card-best-value<% endif %><% if forloop.last and category_product_remainder == 1 %> package-card-fill-row<% endif %>" data-package-id="<%= package.id %>">
                 <% if package.stock.available == false %>
                   <span class="product-stock-badge">Esgotado</span>
                 <% elsif package_id_text == '557587' %>
