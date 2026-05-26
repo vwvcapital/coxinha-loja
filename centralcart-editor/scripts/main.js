@@ -354,19 +354,18 @@ function initPageEntranceMotion() {
   if (mediaQuery.matches) return;
 
   const groups = [
-    { selector: '.rank-banner', step: 0, style: 'hero' },
-    { selector: '.rank-brand-logo', step: 1, style: 'hero' },
-    { selector: '.brand-pill', step: 2, style: 'hero' },
-    { selector: '.rank-render', step: 2, style: 'art' },
-    { selector: '.mobile-store-header', step: 1, style: 'hero' },
-    { selector: '.category-sidebar', step: 3, style: 'nav' },
-    { selector: '.cart-navbar', step: 4, style: 'nav' },
-    { selector: '.category-product-section', step: 5, style: 'section' },
-    { selector: '.category-section-heading', step: 6, style: 'section' },
-    { selector: '.product-card', step: 7, style: 'card', stagger: 45, limit: 18 },
-    { selector: '.faq-item', step: 8, style: 'card', stagger: 55, limit: 12 },
-    { selector: '.coxinha-content-panel, .coxinha-empty-state', step: 6, style: 'section' },
-    { selector: '.coxinha-footer-stage > *', step: 9, style: 'section', stagger: 50 },
+    { selector: '.rank-banner', step: 0, style: 'hero', scale: 0.9 },
+    { selector: '.rank-brand-logo', step: 1, style: 'hero', scale: 0.62 },
+    { selector: '.brand-pill', step: 2, style: 'hero', scale: 0.7 },
+    { selector: '.rank-render', step: 2, style: 'art', scale: 0.68 },
+    { selector: '.mobile-store-header', step: 1, style: 'hero', scale: 0.82 },
+    { selector: '.category-sidebar', step: 3, style: 'nav', scale: 0.86 },
+    { selector: '.cart-navbar', step: 4, style: 'nav', scale: 0.86 },
+    { selector: '.category-section-heading', step: 5, style: 'section', scale: 0.84 },
+    { selector: '.product-card', step: 6, style: 'card', scale: 0.72, stagger: 42, limit: 24 },
+    { selector: '.faq-item', step: 6, style: 'card', scale: 0.78, stagger: 48, limit: 16 },
+    { selector: '.coxinha-content-panel, .coxinha-empty-state', step: 5, style: 'section', scale: 0.84 },
+    { selector: '.coxinha-footer-stage > *', step: 7, style: 'section', scale: 0.86, stagger: 45 },
   ];
 
   const animated = new Set();
@@ -377,24 +376,25 @@ function initPageEntranceMotion() {
     limitedNodes.forEach((node, index) => {
       if (!(node instanceof HTMLElement) || animated.has(node)) return;
       animated.add(node);
-      const delay = (group.step * 70) + (index * (group.stagger || 35));
+      const delay = (group.step * 62) + (index * (group.stagger || 34));
       node.classList.add('page-enter');
       if (group.style) {
         node.setAttribute('data-enter-style', group.style);
       }
-      node.style.setProperty('--enter-delay', `${Math.min(delay, 1100)}ms`);
+      node.style.setProperty('--enter-delay', `${Math.min(delay, 1050)}ms`);
+      node.style.setProperty('--enter-start-scale', String(group.scale || 0.82));
+      node.addEventListener('animationend', () => {
+        node.classList.remove('page-enter');
+        node.removeAttribute('data-enter-style');
+        node.style.removeProperty('--enter-delay');
+        node.style.removeProperty('--enter-start-scale');
+      }, { once: true });
     });
   });
 
   if (animated.size === 0) return;
 
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      animated.forEach((node) => {
-        node.classList.add('page-enter-active');
-      });
-    });
-  });
+  document.documentElement.classList.remove('page-motion-prep');
 }
 
 async function loadCategory(categoryId, element, currentPackage = null) {

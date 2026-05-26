@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="pt-BR">
-<% assign asset_version = 'page-load-motion-20260526-1812' %>
+<% assign asset_version = 'scale-pop-motion-20260526-1801' %>
 
 <head>
   <style>
@@ -38,6 +38,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="coxinha-template-version" content="<%= asset_version %>">
+
+  <script>
+    (function () {
+      try {
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.documentElement.classList.add('page-motion-prep');
+          window.setTimeout(function () {
+            document.documentElement.classList.remove('page-motion-prep');
+          }, 3200);
+        }
+      } catch (_) {}
+    })();
+  </script>
 
   <meta name="robots" content="index, nofollow" />
   <meta property="twitter:image" content="<%= store.theme.logo %>" />
