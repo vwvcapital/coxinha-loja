@@ -23,13 +23,10 @@
               <% assign is_highlighted = widget.package_highlight.id == package.id %>
               <% assign modal_price = package.pricing.min | default: package.pricing.price %>
               <% assign package_id_text = package.id | append: '' %>
-              <% assign package_period_days = '' %>
               <% assign package_month_divisor = 0 %>
               <% if package_id_text == '557586' %>
-                <% assign package_period_days = '60' %>
                 <% assign package_month_divisor = 2 %>
               <% elsif package_id_text == '557587' %>
-                <% assign package_period_days = '90' %>
                 <% assign package_month_divisor = 3 %>
               <% endif %>
               <% if package_month_divisor > 0 %>
@@ -122,7 +119,6 @@
                             <%= modal_price | format_price %><% if has_variations %>+<% endif %>
                           </strong>
                           <% if package_month_divisor > 0 %>
-                            <span class="dialog-period-price">Acesso por <%= package_period_days %> dias</span>
                             <span class="dialog-monthly-price"><%= package_monthly_price | format_price %>/mês equivalente</span>
                           <% endif %>
                         </div>
@@ -169,9 +165,6 @@
                   <% endif %>
                   <p class="price">
                     <span><%= modal_price | format_price %><% if package.variations.size > 0 %>+<% endif %></span>
-                    <% if package_month_divisor > 0 %>
-                      <span class="price-period-badge"><%= package_period_days %> dias</span>
-                    <% endif %>
                   </p>
                   <% if package_month_divisor > 0 %>
                     <p class="price-monthly"><%= package_monthly_price | format_price %>/mês equivalente</p>
