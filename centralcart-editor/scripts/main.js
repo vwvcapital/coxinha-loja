@@ -166,7 +166,6 @@ function closeServerIpDialog() {
 
     dialog.classList.add('hidden');
     dialog.dataset.state = 'closed';
-    document.body.classList.remove('server-ip-modal-open');
   };
 
   const modal = dialog.querySelector('.server-ip-modal');
@@ -197,6 +196,7 @@ function openServerIpDialog(javaIp = '', bedrockIp = '') {
   const scrollX = window.scrollX || window.pageXOffset || 0;
   const scrollY = window.scrollY || window.pageYOffset || 0;
   window.clearTimeout(dialog.__closeTimer);
+  document.body.classList.remove('server-ip-modal-open');
 
   dialog.innerHTML = `
     <div class="server-ip-modal">
@@ -247,7 +247,6 @@ function openServerIpDialog(javaIp = '', bedrockIp = '') {
 
   dialog.dataset.state = 'open';
   dialog.classList.remove('hidden');
-  document.body.classList.add('server-ip-modal-open');
 
   requestAnimationFrame(() => {
     try {

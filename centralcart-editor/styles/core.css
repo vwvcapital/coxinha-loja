@@ -909,8 +909,9 @@ html.page-motion-prep .rank-render {
 
 .brand-pill {
   display: inline-flex;
-  width: min(100%, 282px);
-  min-width: 0;
+  width: fit-content;
+  max-width: min(100%, 318px);
+  min-width: min(100%, 236px);
   align-items: center;
   justify-content: center;
   gap: 0;
@@ -922,11 +923,11 @@ html.page-motion-prep .rank-render {
     0 8px 14px rgba(0, 0, 0, 0.3);
   color: #fff;
   font-family: var(--minecraft-font) !important;
-  font-size: clamp(0.58rem, 1.08vw, 0.72rem);
+  font-size: clamp(1rem, 1.48vw, 1.22rem);
   font-weight: 400;
   letter-spacing: 0;
-  line-height: 1;
-  padding: 13px 17px 12px;
+  line-height: 1.1;
+  padding: 9px 16px 10px;
   text-align: center;
   text-shadow: 2px 2px 0 #050505;
   text-transform: uppercase;
@@ -2062,8 +2063,7 @@ html.page-motion-prep .rank-render {
 }
 
 .server-ip-modal-open {
-  overflow: hidden;
-  overscroll-behavior: none;
+  overscroll-behavior: auto;
 }
 
 .server-ip-overlay {
@@ -2078,7 +2078,7 @@ html.page-motion-prep .rank-render {
   background: rgba(0, 0, 0, 0.68);
   backdrop-filter: blur(8px);
   padding: clamp(18px, 5vw, 52px);
-  overflow: hidden;
+  overflow: auto;
   overscroll-behavior: contain;
 }
 
@@ -2421,9 +2421,11 @@ html.page-motion-prep .rank-render {
   }
 
   .brand-pill {
-    width: min(100%, 262px);
-    font-size: clamp(0.52rem, 2.45vw, 0.66rem);
-    padding: 13px 12px 12px;
+    width: fit-content;
+    max-width: min(100%, 286px);
+    min-width: min(100%, 226px);
+    font-size: clamp(0.78rem, 4vw, 1rem);
+    padding: 10px 12px 11px;
   }
 
   .rank-banner {
