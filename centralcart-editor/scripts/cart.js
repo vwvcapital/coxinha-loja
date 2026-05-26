@@ -139,6 +139,7 @@ function updateCartBadge() {
   if (document.body.classList.contains('checkout-page')) return;
   const count = Cart.getCount();
   const shouldAnimateCartNavbar = count > 0 && (lastCartNavbarCount === null || lastCartNavbarCount < 1);
+  const shouldBounceCartNavbar = count > 0 && lastCartNavbarCount > 0 && count > lastCartNavbarCount;
   const cartButtons = document.querySelectorAll('.open-cart');
   const navbars = document.querySelectorAll('.cart-navbar');
 
@@ -157,6 +158,10 @@ function updateCartBadge() {
       navbar.classList.remove('cart-enter');
       void navbar.offsetWidth;
       navbar.classList.add('cart-enter');
+    } else if (shouldBounceCartNavbar) {
+      navbar.classList.remove('cart-enter', 'cart-pulse');
+      void navbar.offsetWidth;
+      navbar.classList.add('cart-pulse');
     }
   });
 
