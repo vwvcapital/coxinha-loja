@@ -346,6 +346,57 @@ function initRevealObserver() {
   });
 }
 
+function initPageEntranceMotion() {
+  if (window.__coxinhaPageEntranceMotionInit) return;
+  window.__coxinhaPageEntranceMotionInit = true;
+
+  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (mediaQuery.matches) return;
+
+  const groups = [
+    { selector: '.rank-banner', step: 0, style: 'hero' },
+    { selector: '.rank-brand-logo', step: 1, style: 'hero' },
+    { selector: '.brand-pill', step: 2, style: 'hero' },
+    { selector: '.rank-render', step: 2, style: 'art' },
+    { selector: '.mobile-store-header', step: 1, style: 'hero' },
+    { selector: '.category-sidebar', step: 3, style: 'nav' },
+    { selector: '.cart-navbar', step: 4, style: 'nav' },
+    { selector: '.category-product-section', step: 5, style: 'section' },
+    { selector: '.category-section-heading', step: 6, style: 'section' },
+    { selector: '.product-card', step: 7, style: 'card', stagger: 45, limit: 18 },
+    { selector: '.faq-item', step: 8, style: 'card', stagger: 55, limit: 12 },
+    { selector: '.coxinha-content-panel, .coxinha-empty-state', step: 6, style: 'section' },
+    { selector: '.coxinha-footer-stage > *', step: 9, style: 'section', stagger: 50 },
+  ];
+
+  const animated = new Set();
+  groups.forEach((group) => {
+    const nodes = Array.from(document.querySelectorAll(group.selector));
+    const limitedNodes = typeof group.limit === 'number' ? nodes.slice(0, group.limit) : nodes;
+
+    limitedNodes.forEach((node, index) => {
+      if (!(node instanceof HTMLElement) || animated.has(node)) return;
+      animated.add(node);
+      const delay = (group.step * 70) + (index * (group.stagger || 35));
+      node.classList.add('page-enter');
+      if (group.style) {
+        node.setAttribute('data-enter-style', group.style);
+      }
+      node.style.setProperty('--enter-delay', `${Math.min(delay, 1100)}ms`);
+    });
+  });
+
+  if (animated.size === 0) return;
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      animated.forEach((node) => {
+        node.classList.add('page-enter-active');
+      });
+    });
+  });
+}
+
 async function loadCategory(categoryId, element, currentPackage = null) {
   const url = currentPackage
     ? `/search?category_id=${categoryId}&current_package=${currentPackage}&limit=10`
@@ -382,6 +433,7 @@ async function loadCategory(categoryId, element, currentPackage = null) {
 }
 
 (() => {
+  initPageEntranceMotion();
   initRevealObserver();
 
   document.querySelectorAll('.package-list').forEach((element) => {
