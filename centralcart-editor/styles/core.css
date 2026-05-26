@@ -896,11 +896,14 @@ html.page-motion-prep .rank-render {
     0 4px 0 #050505,
     0 8px 14px rgba(0, 0, 0, 0.3);
   color: #fff;
-  font-size: clamp(18px, 1.45vw, 21px);
-  font-weight: 900;
+  font-family: var(--minecraft-font);
+  font-size: clamp(0.58rem, 1.08vw, 0.72rem);
+  font-weight: 400;
+  letter-spacing: 0;
   line-height: 1;
-  padding: 10px 17px 9px;
+  padding: 13px 17px 12px;
   text-align: center;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -2018,19 +2021,42 @@ html.page-motion-prep .rank-render {
 
 .server-ip-modal-open {
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 .server-ip-overlay {
   position: fixed;
   inset: 0;
-  z-index: 120;
-  display: grid;
+  z-index: 13000;
+  display: flex;
   align-items: center;
-  justify-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100dvh;
   background: rgba(0, 0, 0, 0.68);
   backdrop-filter: blur(8px);
   padding: clamp(18px, 5vw, 52px);
-  overflow-y: auto;
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.server-ip-overlay[data-state="open"] {
+  animation: server-ip-overlay-in 220ms ease-out both;
+}
+
+.server-ip-overlay[data-state="opening"] {
+  opacity: 0;
+}
+
+.server-ip-overlay[data-state="opening"] .server-ip-modal {
+  opacity: 0;
+  filter: blur(10px);
+  transform: scale(0.76);
+}
+
+.server-ip-overlay[data-state="closing"] {
+  animation: server-ip-overlay-out 240ms ease-in both;
+  pointer-events: none;
 }
 
 .server-ip-overlay.hidden {
@@ -2040,9 +2066,9 @@ html.page-motion-prep .rank-render {
 .server-ip-modal {
   position: relative;
   display: grid;
-  width: min(100%, 720px);
-  min-height: min(680px, calc(100dvh - 32px));
-  align-content: center;
+  width: min(100%, 560px);
+  max-height: calc(100dvh - 32px);
+  align-content: start;
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 18px;
   background:
@@ -2052,7 +2078,18 @@ html.page-motion-prep .rank-render {
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 18px 48px rgba(0, 0, 0, 0.5);
   color: #fff;
-  padding: clamp(26px, 6vw, 58px);
+  padding: clamp(24px, 5vw, 44px);
+  overflow: auto;
+  transform-origin: center;
+}
+
+.server-ip-overlay[data-state="open"] .server-ip-modal {
+  animation: coxinha-pop-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  --enter-start-scale: 0.76;
+}
+
+.server-ip-overlay[data-state="closing"] .server-ip-modal {
+  animation: server-ip-modal-out 220ms cubic-bezier(0.55, 0.06, 0.68, 0.19) both;
 }
 
 .server-ip-close {
@@ -2071,8 +2108,9 @@ html.page-motion-prep .rank-render {
 .server-ip-kicker {
   margin: 0 44px 8px 0;
   color: var(--accent-bright);
+  font-family: var(--minecraft-font);
   font-size: 0.72rem;
-  font-weight: 900;
+  font-weight: 400;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -2080,9 +2118,9 @@ html.page-motion-prep .rank-render {
 .server-ip-title {
   margin: 0;
   color: #fff;
-  font-size: clamp(2rem, 7vw, 4rem);
+  font-size: clamp(1.45rem, 4.4vw, 2.5rem);
   font-weight: 900;
-  line-height: 0.9;
+  line-height: 0.95;
   text-shadow: 0 2px 0 #000;
 }
 
@@ -2125,8 +2163,9 @@ html.page-motion-prep .rank-render {
 }
 
 .server-ip-copy-option strong {
+  font-family: var(--minecraft-font);
   font-size: 0.88rem;
-  font-weight: 900;
+  font-weight: 400;
   line-height: 1;
 }
 
@@ -2142,9 +2181,9 @@ html.page-motion-prep .rank-render {
   max-width: 150px;
   overflow-wrap: anywhere;
   color: var(--accent-bright);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--minecraft-font);
   font-size: 0.78rem;
-  font-weight: 900;
+  font-weight: 400;
   line-height: 1.2;
   text-align: right;
 }
@@ -2157,6 +2196,40 @@ html.page-motion-prep .rank-render {
   border-radius: 8px;
   background: linear-gradient(180deg, var(--accent-bright) 0%, var(--accent) 92%);
   color: #fff;
+}
+
+@keyframes server-ip-overlay-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes server-ip-overlay-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes server-ip-modal-out {
+  from {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    filter: blur(8px);
+    transform: scale(0.86);
+  }
 }
 
 @media (max-width: 700px) {
@@ -2317,8 +2390,8 @@ html.page-motion-prep .rank-render {
 
   .brand-pill {
     width: min(100%, 262px);
-    font-size: clamp(15px, 4.6vw, 18px);
-    padding: 11px 12px 10px;
+    font-size: clamp(0.52rem, 2.45vw, 0.66rem);
+    padding: 13px 12px 12px;
   }
 
   .rank-banner {
@@ -2385,20 +2458,20 @@ html.page-motion-prep .rank-render {
   }
 
   .server-ip-overlay {
-    align-items: stretch;
-    padding: 10px;
+    align-items: center;
+    padding: 14px;
   }
 
   .server-ip-modal {
     width: 100%;
-    min-height: calc(100dvh - 20px);
+    max-height: calc(100dvh - 28px);
     border-radius: 14px;
     padding: 56px 16px 18px;
   }
 
   .server-ip-title {
-    font-size: clamp(2rem, 13vw, 3.1rem);
-    line-height: 0.92;
+    font-size: clamp(1.55rem, 8.5vw, 2.45rem);
+    line-height: 0.96;
   }
 
   .server-ip-options {

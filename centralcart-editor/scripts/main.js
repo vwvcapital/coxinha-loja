@@ -156,9 +156,31 @@ function getServerIpDialog() {
 function closeServerIpDialog() {
   const dialog = document.getElementById('server-ip-dialog');
   if (!dialog) return;
+  if (dialog.classList.contains('hidden')) return;
+  if (dialog.dataset.state === 'closing') return;
 
-  dialog.classList.add('hidden');
-  document.body.classList.remove('server-ip-modal-open');
+  dialog.dataset.state = 'closing';
+
+  const finishClose = () => {
+    if (dialog.dataset.state !== 'closing') return;
+
+    dialog.classList.add('hidden');
+    dialog.dataset.state = 'closed';
+    document.body.classList.remove('server-ip-modal-open');
+
+    if (dialog.__returnFocus && typeof dialog.__returnFocus.focus === 'function') {
+      try {
+        dialog.__returnFocus.focus({ preventScroll: true });
+      } catch (_) {}
+    }
+
+    dialog.__returnFocus = null;
+  };
+
+  const modal = dialog.querySelector('.server-ip-modal');
+  window.clearTimeout(dialog.__closeTimer);
+  modal?.addEventListener('animationend', finishClose, { once: true });
+  dialog.__closeTimer = window.setTimeout(finishClose, 320);
 }
 
 function openServerIpDialog(javaIp = '', bedrockIp = '') {
@@ -180,6 +202,11 @@ function openServerIpDialog(javaIp = '', bedrockIp = '') {
   ];
 
   const dialog = getServerIpDialog();
+  const scrollX = window.scrollX || window.pageXOffset || 0;
+  const scrollY = window.scrollY || window.pageYOffset || 0;
+  dialog.__returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  window.clearTimeout(dialog.__closeTimer);
+
   dialog.innerHTML = `
     <div class="server-ip-modal">
       <button type="button" class="server-ip-close" data-server-ip-close aria-label="Fechar">
@@ -227,14 +254,27 @@ function openServerIpDialog(javaIp = '', bedrockIp = '') {
     });
   });
 
+  dialog.dataset.state = 'opening';
   dialog.classList.remove('hidden');
   document.body.classList.add('server-ip-modal-open');
+
+  requestAnimationFrame(() => {
+    dialog.dataset.state = 'open';
+    try {
+      window.scrollTo(scrollX, scrollY);
+    } catch (_) {}
+  });
 
   if (window.lucide) {
     lucide.createIcons();
   }
 
-  dialog.querySelector('[data-server-ip-copy]')?.focus();
+  window.setTimeout(() => {
+    try {
+      dialog.querySelector('[data-server-ip-close]')?.focus({ preventScroll: true });
+      window.scrollTo(scrollX, scrollY);
+    } catch (_) {}
+  }, 80);
 }
 
 function getScriptData(id, fallback = []) {
