@@ -122,9 +122,12 @@
 
           <script type="application/json" data-package-fields="<%= package.id %>"><%= display_package.fields | json %></script>
 
+          <% assign package_id_text = package.id | append: '' %>
           <article class="product-card package-card" data-package-id="<%= package.id %>">
             <% if package.stock.available == false %>
               <span class="product-stock-badge">Esgotado</span>
+            <% elsif package_id_text == '560962' %>
+              <span class="promo-badge">PROMOÇÃO</span>
             <% elsif is_highlighted %>
               <span class="popular-badge">Destaque</span>
             <% endif %>
@@ -136,7 +139,9 @@
             <p class="text-2xl product-card-title"><%= package.name %></p>
 
             <div class="product-card-price-block">
-              <% if package.pricing.compare_at %>
+              <% if package_id_text == '560962' %>
+                <p class="price-compare price-compare-promo">de <span>R$4,90</span></p>
+              <% elsif package.pricing.compare_at %>
                 <p class="price-compare">de <span><%= package.pricing.compare_at | format_price %></span></p>
               <% endif %>
               <p class="price"><%= modal_price | format_price %><% if package.variations.size > 0 %>+<% endif %></p>

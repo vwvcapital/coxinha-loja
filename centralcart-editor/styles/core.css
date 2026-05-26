@@ -1497,6 +1497,40 @@ html.page-motion-prep .rank-render {
   text-decoration: line-through;
 }
 
+.promo-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(255, 207, 63, 0.98) 0%, rgba(255, 139, 11, 0.98) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.36),
+    0 8px 18px rgba(255, 126, 10, 0.24),
+    0 2px 0 rgba(87, 31, 0, 0.44);
+  color: #fff;
+  font-family: var(--minecraft-font);
+  font-size: 0.76rem;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  padding: 9px 11px 8px;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.38);
+  transform: rotate(-5deg);
+}
+
+.price-compare-promo {
+  color: var(--accent-bright);
+  font-family: var(--minecraft-font);
+  font-size: 0.82rem;
+  font-style: normal;
+  font-weight: 400;
+  text-shadow: 0 2px 0 #000;
+}
+
 .card-action-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 42px;
@@ -2648,6 +2682,17 @@ html.page-motion-prep .rank-render {
   }
 
   .price-compare {
+    font-size: 0.66rem;
+  }
+
+  .promo-badge {
+    top: 8px;
+    left: 8px;
+    font-size: 0.54rem;
+    padding: 6px 7px 5px;
+  }
+
+  .price-compare-promo {
     font-size: 0.66rem;
   }
 
