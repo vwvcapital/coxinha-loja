@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="pt-BR">
-<% assign asset_version = 'minecraft-ip-popup-20260526-1845' %>
+<% assign asset_version = 'ip-dialog-fixed-20260526-1849' %>
 
 <head>
   <style>
@@ -31,8 +31,38 @@
       --accent-bright: #ffc33a;
       --accent-deep: #df6510;
       --accent-text: #5a2205;
-      --minecraft-font: "Minecraft", "Minecraft Regular", "Courier New", monospace;
+      --minecraft-font: "CoxinhaMinecraft", "Minecraft", "Courier New", monospace;
       --scene-image: url('https://media.discordapp.net/attachments/1507091466219028571/1508792821145014282/ChatGPT_Image_26_de_mai._de_2026_08_23_27.png?ex=6a16d450&is=6a1582d0&hm=3448107a6e9297489da03845e2118bec3762c9988b12d11868734e24f8d3a92d&=&format=webp&quality=lossless&width=766&height=431');
+    }
+
+    @font-face {
+      font-family: "CoxinhaMinecraft";
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url("https://fonts.cdnfonts.com/s/25041/1_MinecraftRegular1.woff") format("woff");
+    }
+
+    body.server-ip-modal-open {
+      overflow: visible !important;
+    }
+
+    #server-ip-dialog.server-ip-overlay {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 2147483000 !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100vw !important;
+      height: 100dvh !important;
+    }
+
+    #server-ip-dialog.server-ip-overlay:not(.hidden) {
+      display: flex !important;
+    }
+
+    #server-ip-dialog.server-ip-overlay.hidden {
+      display: none !important;
     }
   </style>
 
@@ -78,7 +108,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/minecraft-3" rel="stylesheet">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/keen-slider@latest/keen-slider.min.css" />
 

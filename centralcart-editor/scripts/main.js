@@ -133,6 +133,13 @@ function getServerIpDialog() {
   dialog.setAttribute('role', 'dialog');
   dialog.setAttribute('aria-modal', 'true');
   dialog.setAttribute('aria-labelledby', 'server-ip-dialog-title');
+  dialog.style.setProperty('position', 'fixed', 'important');
+  dialog.style.setProperty('inset', '0', 'important');
+  dialog.style.setProperty('z-index', '2147483000', 'important');
+  dialog.style.setProperty('align-items', 'center', 'important');
+  dialog.style.setProperty('justify-content', 'center', 'important');
+  dialog.style.setProperty('width', '100vw', 'important');
+  dialog.style.setProperty('height', '100dvh', 'important');
 
   dialog.addEventListener('click', (event) => {
     if (
@@ -166,6 +173,7 @@ function closeServerIpDialog() {
 
     dialog.classList.add('hidden');
     dialog.dataset.state = 'closed';
+    dialog.style.removeProperty('display');
   };
 
   const modal = dialog.querySelector('.server-ip-modal');
@@ -246,6 +254,7 @@ function openServerIpDialog(javaIp = '', bedrockIp = '') {
   });
 
   dialog.dataset.state = 'open';
+  dialog.style.setProperty('display', 'flex', 'important');
   dialog.classList.remove('hidden');
 
   requestAnimationFrame(() => {

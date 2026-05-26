@@ -923,6 +923,8 @@ html.page-motion-prep .rank-render {
     0 8px 14px rgba(0, 0, 0, 0.3);
   color: #fff;
   font-family: var(--minecraft-font) !important;
+  font-style: normal !important;
+  font-synthesis: none;
   font-size: clamp(1rem, 1.48vw, 1.22rem);
   font-weight: 400;
   letter-spacing: 0;
@@ -937,6 +939,7 @@ html.page-motion-prep .rank-render {
 .brand-pill span {
   color: var(--accent-bright);
   font-family: inherit !important;
+  font-style: normal !important;
 }
 
 .server-ip-trigger:active {
@@ -2067,14 +2070,14 @@ html.page-motion-prep .rank-render {
 }
 
 .server-ip-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 13000;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483000 !important;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100vw;
-  height: 100dvh;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100vw !important;
+  height: 100dvh !important;
   background: rgba(0, 0, 0, 0.68);
   backdrop-filter: blur(8px);
   padding: clamp(18px, 5vw, 52px);
@@ -2092,7 +2095,7 @@ html.page-motion-prep .rank-render {
 }
 
 .server-ip-overlay.hidden {
-  display: none;
+  display: none !important;
 }
 
 .server-ip-modal {
