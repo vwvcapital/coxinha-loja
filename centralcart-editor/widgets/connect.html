@@ -1,0 +1,27 @@
+<% load "widget", type: "connection_board" %>
+<% assign store_type = store.type | downcase %>
+
+<div 
+  class="w-full h-64 bg-[url('<%= '/public/assets/templates/LUMINA/connect-' | append: store_type | append: '.png' | cdn %>')] 
+  bg-no-repeat bg-right md:bg-[length:60%] object-cover rounded-xl"
+>
+  <div class="flex flex-col justify-center pl-14 h-full w-full 
+    rounded-xl from-50% bg-gradient-to-r from-muted to-transparent
+    max-md:w-full max-md:text-center max-md:px-5 "
+  >
+    <div class="text-center md:text-left">
+        <h2 class="flex items-center justify-center md:justify-start gap-2 text-3xl text-foreground font-bold">
+          Jogue agora <i data-lucide="gamepad-2" class="size-10 text-primary"></i>
+        </h2>
+        <p class="text-lg text-foreground/50 font-light mt-1 max-md:text-base md:w-[396px]">
+          Junte-se a outros jogadores e divirta-se no nosso servidor! Estamos te aguardando.
+        </p>
+    </div>
+
+    <button id="copy-ip"
+      class="btn-primary mt-6 md:max-w-72 w-full h-12 rounded-t-none rounded-b-2xl max-md:mx-auto"
+      onclick="handleCopyIpToClipboard('<%= widget.address %>', '<%= store.type %>')">
+      Acesse o nosso servidor
+    </button>
+  </div>
+</div>

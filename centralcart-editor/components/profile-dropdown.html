@@ -1,0 +1,120 @@
+<% load 'affiliate_settings' %>
+
+<div class="relative">
+  <button 
+    class="flex items-center justify-start text-start gap-2 cursor-pointer group w-max" 
+    onclick="handleProfileMenu()" 
+    id="profile-button"
+  >
+    <% if user and user.avatar %>
+      <img src="<%= user.avatar %>" class="size-8 rounded-cc sm:rounded-full object-cover" alt="<%= user.name %>" />
+    <% else %>
+      <div class="size-9 bg-primary flex items-center justify-center uppercase rounded-cc sm:rounded-full"><%= user.name | slice: 0, 2 | upcase %></div>
+    <% endif %>
+
+    <div class="hidden sm:block">
+      <div><%= user.name %></div>
+      <p class="text-xs text-muted-foreground">Meu perfil</p>
+    </div>
+
+    <i data-lucide="chevron-down" class="hidden sm:block group-data-[state=open]:rotate-180 transition-transform size-4 ml-auto"></i>
+  </button>
+  
+  <div 
+    class="max-h-[calc(100vh-4rem-2.25rem)] overflow-y-auto absolute top-16 bg-background p-3 -right-12 sm:right-0 rounded-cc 
+    border border-foreground/10 w-[250px] origin-top-right z-50
+    scale-75 transition-all invisible opacity-0 duration-200" 
+    id="profile-menu"
+  >
+    <div class="flex items-center gap-2">
+      <% if user and user.avatar %>
+      <img src="<%= user.avatar %>" class="size-10 rounded-cc object-cover" alt="<%= user.name %>" />
+      <% else %>
+      <div class="size-10 shrink-0 bg-secondary flex items-center justify-center uppercase rounded-cc"><%= user.name | slice: 0, 2 | upcase %></div>
+      <% endif %>
+      <div class="overflow-hidden">
+        <div><%= user.name %></div>
+        <p class="text-xs text-muted-foreground truncate w-full"><%= user.email %></p>
+      </div>
+    </div>
+
+    <hr class="bg-muted my-3">
+
+    <div class="w-full flex flex-col gap-2">
+      <div>
+        <a href="/account/orders" class="text-sm w-full p-2 hover:bg-muted hover:text-primary-foreground flex items-center gap-2 rounded-md transition">
+          <i data-lucide="package" class="size-4"></i>
+          Meus pedidos
+        </a>
+      </div>
+
+      <% if affiliate_settings.status == 'affiliate' or affiliate_settings.allow_self_affiliate == true %>
+        <div>
+          <a href="/account/affiliate" class="text-sm w-full p-2 hover:bg-muted hover:text-primary-foreground flex items-center gap-2 rounded-md transition">
+            <i data-lucide="users" class="size-4"></i>
+            Área do afiliado
+          </a>
+        </div>
+      <% endif %>
+
+      <hr class="bg-muted">
+
+      <button 
+        class="text-sm w-full p-2 text-red-500 hover:bg-red-500/10 flex items-center gap-2 rounded-md transition"
+        onclick="logout()"
+      >
+        <i data-lucide="log-out" class="size-4"></i>
+        Sair da conta
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const profileMenu = document.getElementById("profile-menu")
+  const profileButton = document.getElementById("profile-button")
+  
+  function openProfileMenu() {
+    profileButton.setAttribute("data-state", "open")
+
+    profileMenu.classList.remove("invisible")
+    setTimeout(() => {
+      profileMenu.classList.add("scale-100", "opacity-100")
+    }, 1);
+  }
+
+  function closeProfileMenu() {
+    profileButton.setAttribute("data-state", "closed")
+
+    profileMenu.classList.remove("scale-100", "opacity-100")
+    profileMenu.classList.add("scale-75", "opacity-0")
+    setTimeout(() => {
+      profileMenu.classList.add("invisible")
+    }, 199);
+  }
+
+  function handleProfileMenu() {
+    if (profileMenu.classList.contains("invisible")) {
+      openProfileMenu()
+    } else {
+      closeProfileMenu()
+    }
+  }
+
+  function logout() {
+    CentralCart.logout().then(() => {
+      window.location.href = '/login'
+    })
+  }
+
+  window.addEventListener("click", (event) => {
+    const isClickInsideMenu = profileMenu.contains(event.target);
+    const isClickOnButton = profileButton.contains(event.target);
+
+    if (!isClickInsideMenu && !isClickOnButton) {
+      closeProfileMenu();
+    }
+  });
+</script>
+
+

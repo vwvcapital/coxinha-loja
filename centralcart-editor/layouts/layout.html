@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="pt-BR">
+<% assign asset_version = 'buy-click-no-scroll-side-effects-20260526-1112' %>
+
+<head>
+  <style>
+    :root {
+      --primary: 36 100% 54%;
+      --secondary: 42 100% 61%;
+
+      --background: 16 16 16;
+      --foreground: 250 250 250;
+
+      --border: 255 255 255 / 0.08;
+      --card: var(--background);
+
+      --muted: 27 27 27;
+      --muted-contrast: 10 10 10;
+      --muted-foreground: 154 154 154;
+
+      --muted-solid: 27, 27, 27;
+
+      --radius: 0.5rem;
+
+      --background-image: url('<%= config.background_image %>');
+
+      --page-bg: #101010;
+      --panel: #1f1f1f;
+      --panel-dark: #080808;
+      --accent: #ff9f16;
+      --accent-bright: #ffc33a;
+      --accent-deep: #df6510;
+      --accent-text: #5a2205;
+      --scene-image: url('https://media.discordapp.net/attachments/1507091466219028571/1508792821145014282/ChatGPT_Image_26_de_mai._de_2026_08_23_27.png?ex=6a16d450&is=6a1582d0&hm=3448107a6e9297489da03845e2118bec3762c9988b12d11868734e24f8d3a92d&=&format=webp&quality=lossless&width=766&height=431');
+    }
+  </style>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="coxinha-template-version" content="<%= asset_version %>">
+
+  <meta name="robots" content="index, nofollow" />
+  <meta property="twitter:image" content="<%= store.theme.logo %>" />
+  <meta property="twitter:card" content="summary" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:title" content="<%= store.name %> - <%= page_title %>" />
+  <meta property="og:site_name" content="<%= store.name %>" />
+  <meta property="og:description" content="<%= theme.description %>" />
+  <meta property="og:image" content="<%= theme.logo %>" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="627" />
+  <meta name="description" content="<%= theme.description %>" />
+  <meta name="keywords" content="<%= theme.keywords %>" />
+
+  <% assign defaultFavicon = 'public/36x36.png' | cdn %>
+  <% assign favicon = theme.favicon | default: defaultFavicon %>
+  <link rel="icon" type="image/x-icon" href="<%= favicon %>" />
+  <link rel="stylesheet" href="/styles/core.css?v=<%= asset_version %>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/keen-slider@latest/keen-slider.min.css" />
+
+  <title>
+    <%= store.name %> - <%= page_title %>
+  </title>
+
+  <script>
+    (function () {
+      if (!window.__coxinhaFreezeScroll) {
+        window.__coxinhaFreezeScroll = function freezeScroll(duration) {
+          return;
+          const lockDuration = duration || 6000;
+          const existingLock = window.__coxinhaScrollLock;
+          if (existingLock && existingLock.active && typeof existingLock.extend === 'function') {
+            existingLock.extend(lockDuration);
+            return;
+          }
+
+          const scrollingElement = document.scrollingElement || document.documentElement;
+          const startX = window.scrollX || window.pageXOffset || scrollingElement.scrollLeft || 0;
+          const startY = window.scrollY || window.pageYOffset || scrollingElement.scrollTop || 0;
+          const originalScrollTo = window.scrollTo;
+          const originalScrollBy = window.scrollBy;
+          const originalScrollIntoView = Element.prototype.scrollIntoView;
+          const originalFocus = HTMLElement.prototype.focus;
+          let active = true;
+          let cleanupTimer = null;
+          const timers = [];
+
+          const schedule = function (callback, delay) {
+            const timer = window.setTimeout(callback, delay);
+            timers.push(timer);
+            return timer;
+          };
+
+          const restore = function () {
+            if (!active) return;
+            scrollingElement.scrollLeft = startX;
+            scrollingElement.scrollTop = startY;
+            document.documentElement.scrollLeft = startX;
+            document.documentElement.scrollTop = startY;
+            document.body.scrollLeft = startX;
+            document.body.scrollTop = startY;
+            try {
+              originalScrollTo.call(window, startX, startY);
+            } catch (_) {}
+          };
+
+          const cleanup = function () {
+            if (!active) return;
+            active = false;
+            if (window.__coxinhaScrollLock) {
+              window.__coxinhaScrollLock.active = false;
+            }
+            window.removeEventListener('scroll', onScroll, true);
+            window.removeEventListener('wheel', releaseForUserScroll, true);
+            window.removeEventListener('touchmove', releaseForUserScroll, true);
+            window.removeEventListener('keydown', releaseForUserScroll, true);
+            timers.forEach(function (timer) {
+              window.clearTimeout(timer);
+            });
+            try {
+              window.scrollTo = originalScrollTo;
+              window.scrollBy = originalScrollBy;
+              Element.prototype.scrollIntoView = originalScrollIntoView;
+              HTMLElement.prototype.focus = originalFocus;
+              originalScrollTo.call(window, startX, startY);
+            } catch (_) {}
+          };
+
+          const releaseForUserScroll = function (event) {
+            if (event.type === 'keydown') {
+              const scrollKeys = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '];
+              if (!scrollKeys.includes(event.key)) return;
+            }
+            cleanup();
+          };
+
+          const onScroll = function () {
+            if (!active) return;
+            requestAnimationFrame(restore);
+          };
+
+          try {
+            window.scrollTo = restore;
+            window.scrollBy = restore;
+            Element.prototype.scrollIntoView = restore;
+            HTMLElement.prototype.focus = function focusWithoutScroll(options) {
+              const nextOptions = typeof options === 'object' && options !== null ? options : {};
+              try {
+                return originalFocus.call(this, { ...nextOptions, preventScroll: true });
+              } catch (_) {
+                return originalFocus.call(this);
+              }
+            };
+          } catch (_) {}
+
+          window.addEventListener('scroll', onScroll, true);
+          window.addEventListener('wheel', releaseForUserScroll, { capture: true, passive: true });
+          window.addEventListener('touchmove', releaseForUserScroll, { capture: true, passive: true });
+          window.addEventListener('keydown', releaseForUserScroll, true);
+
+          window.__coxinhaScrollLock = {
+            active: true,
+            extend: function (nextDuration) {
+              [0, 40, 120, 240, 500, 900, 1400, 2200, 3400, 4800, nextDuration].forEach(function (delay) {
+                schedule(restore, delay);
+              });
+              if (cleanupTimer) window.clearTimeout(cleanupTimer);
+              cleanupTimer = schedule(cleanup, nextDuration + 200);
+            },
+          };
+
+          restore();
+          [0, 40, 120, 240, 500, 900, 1400, 2200, 3400, 4800, lockDuration].forEach(function (delay) {
+            schedule(restore, delay);
+          });
+          cleanupTimer = schedule(cleanup, lockDuration + 200);
+        };
+      }
+
+      if (!window.__coxinhaPackageClickCapture) {
+        window.__coxinhaPackageClickCapture = true;
+
+        const getPackageButton = function (event) {
+          const target = event && event.target;
+          return target && target.closest ? target.closest('[data-package-card-button]') : null;
+        };
+
+        const primeScrollLock = function (event) {
+          const button = getPackageButton(event);
+          if (!button || button.disabled) return;
+          window.__coxinhaFreezeScroll(6000);
+        };
+
+        const interceptPackageClick = function (event) {
+          const button = getPackageButton(event);
+          if (!button || button.disabled) return;
+
+          window.__coxinhaFreezeScroll(6000);
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+
+          if (typeof window.initPackageCardButtons === 'function') {
+            window.initPackageCardButtons();
+          }
+
+          if (typeof button.__packageCardClickHandler === 'function') {
+            button.__packageCardClickHandler(event);
+          }
+        };
+
+        window.addEventListener('pointerdown', primeScrollLock, true);
+        window.addEventListener('mousedown', primeScrollLock, true);
+        window.addEventListener('touchstart', primeScrollLock, { capture: true, passive: true });
+        window.addEventListener('click', interceptPackageClick, true);
+      }
+
+      const originalAttachShadow = Element.prototype.attachShadow;
+      if (!originalAttachShadow || Element.prototype.__safeAttachShadow) return;
+
+      Object.defineProperty(Element.prototype, '__safeAttachShadow', {
+        value: true,
+        configurable: true,
+      });
+
+      Element.prototype.attachShadow = function attachShadowOnce(init) {
+        if (this.shadowRoot && (!init || init.mode !== 'closed')) {
+          return this.shadowRoot;
+        }
+        return originalAttachShadow.call(this, init);
+      };
+    })();
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "hsl(var(--primary))",
+            secondary: "hsl(var(--secondary))",
+            
+            background: "rgb(var(--background))",
+            card: "rgb(var(--card))",
+            foreground: "rgb(var(--foreground))",
+            border: "rgb(var(--border))",
+            muted: "rgb(var(--muted))",
+            "muted-contrast": "rgb(var(--muted-contrast))",
+            "muted-foreground": "rgb(var(--muted-foreground))",
+            "muted-solid": "rgb(var(--muted-solid))",
+          },
+          borderRadius: {
+            cc: 'var(--radius)',
+          }
+        },
+        container: {
+          center: true,
+          padding: "1rem",
+          screens: {
+            "xl": "1280px",
+          },
+        },
+      },
+    };
+  </script>
+  <style type="text/tailwindcss">
+    @layer base {
+      * {
+        @apply border-border;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        @apply bg-background text-foreground;
+      }
+
+      input, select {
+        @apply appearance-none bg-background border border-foreground/10 rounded-cc text-foreground px-2 h-8 text-sm;
+      }
+
+      input:focus-visible, select:focus-visible {
+        outline: none;
+        @apply ring-2 ring-primary;
+      }
+
+      .bg-primary {
+        color: lch(from hsl(var(--primary)) calc((49.44 - l) * infinity) 0 0);
+      }
+
+      .bg-background {
+        color: lch(from hsl(var(--background)) calc((49.44 - l) * infinity) 0 0);
+      }
+
+      .btn-primary {
+        @apply bg-primary hover:bg-primary/85 transition-colors duration-300 font-semibold rounded-cc 
+        px-4 h-9 flex gap-2 items-center justify-center text-sm disabled:opacity-50;
+      }
+
+      .btn-secondary {
+        @apply bg-foreground/5 hover:bg-foreground/10 transition-colors duration-300 font-semibold rounded-cc 
+        px-4 h-9 flex gap-2 items-center justify-center text-sm disabled:opacity-50;
+      }
+
+      .btn-outline {
+        @apply bg-white/[.01] hover:bg-white/5 backdrop-blur-sm transition-colors font-semibold border border-foreground/10 rounded-cc 
+        px-4 h-9 flex gap-2 items-center justify-center text-sm disabled:opacity-50;
+      }
+
+      .btn-ghost {
+        @apply bg-transparent hover:bg-foreground/5 transition-colors font-semibold rounded-cc 
+        px-4 h-9 flex gap-2 items-center justify-center text-sm disabled:opacity-50;
+      }
+
+      .package-card__info-btn {
+        @apply flex items-center justify-center transition gap-2 px-4 font-semibold text-white/50 bg-primary brightness-110 hover:brightness-125
+        duration-300 hover:shadow-xl hover:shadow-black/50;
+      }
+
+      .package-card__cart-btn {
+        @apply flex-1 h-full rounded-none;
+      }
+    }
+  </style>
+</head>
+
+<body class="coxinha-template min-h-screen flex flex-col <% if page_title == 'Carrinho' %>checkout-page<% endif %>">
+  <div class="coxinha-scene" aria-hidden="true">
+    <div class="coxinha-scene__image"></div>
+    <div class="coxinha-scene__overlay"></div>
+    <div class="coxinha-scene__particles">
+      <span class="leaf leaf-1"></span>
+      <span class="leaf leaf-2"></span>
+      <span class="leaf leaf-3"></span>
+      <span class="leaf leaf-4"></span>
+      <span class="leaf leaf-5"></span>
+      <span class="leaf leaf-6"></span>
+      <span class="leaf leaf-7"></span>
+      <span class="leaf leaf-8"></span>
+      <span class="leaf leaf-9"></span>
+      <span class="leaf leaf-10"></span>
+    </div>
+  </div>
+  <% render "components/top-announce" %>
+  <% render "components/header" %>
+  <% render "components/navbar" %>
+  <div id="cart-drawer" class="w-screen h-dvh flex items-center justify-end z-50 fixed top-0 left-0 group hidden" data-state="closed">
+    <div class="h-full w-full lg:w-[450px] p-5 flex flex-col bg-background border-l">
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-lg font-semibold">Carrinho</h4>
+        <button onclick="closeCart()" type="button" aria-label="Fechar carrinho">
+          <i data-lucide="x" class="text-muted-foreground hover:text-foreground transition-colors size-5"></i>
+        </button>
+      </div>
+      <div class="space-y-3 h-full flex flex-col" id="cart-drawer-wrapper"></div>
+      <div class="mt-auto">
+        <div class="bg-muted w-full px-3 h-12 items-center rounded-cc flex justify-between mb-3" id="cart-pricing">
+          <p class="font-normal text-muted-foreground">Valor total:</p>
+          <span class="font-semibold"><%= 0 | format_price %></span>
+        </div>
+        <a href="/checkout" class="btn-primary text-base h-10">
+          Ir para a compra
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <% capture custom_fields_content %>
+    <div class="w-full flex flex-col">
+      <div class="space-y-4" data-custom-fields-fields></div>
+      <button type="button" class="btn-primary h-10 w-full mt-6" data-custom-fields-confirm>Confirmar</button>
+    </div>
+  <% endcapture %>
+  <% render 'components/dialog', id: 'custom-fields', title: 'Produto', content: custom_fields_content %>
+
+  <script>
+    (function () {
+      const confirmBtn = document.querySelector('[data-custom-fields-confirm]');
+      if (!confirmBtn) return;
+
+      let currentPackageId = null;
+
+      confirmBtn.addEventListener('click', () => {
+        if (!currentPackageId) return;
+
+        const fields = window.CustomFields?.collect();
+        if (fields === null) return;
+
+        const dispatchAddToCart = () => {
+          if (typeof closeDialog === 'function') closeDialog('custom-fields');
+
+          const event = new CustomEvent('package:add-to-cart-with-fields', {
+            detail: { packageId: currentPackageId, fields },
+            bubbles: false,
+          });
+          document.dispatchEvent(event);
+        };
+
+        if (typeof withProgrammaticScrollBlocked === 'function') {
+          withProgrammaticScrollBlocked(dispatchAddToCart);
+        } else {
+          dispatchAddToCart();
+        }
+      });
+
+      document.addEventListener('package:prepare-custom-fields', (e) => {
+        currentPackageId = e.detail.packageId;
+      });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      const standaloneNumberInputs = '<%= store.type %>' === 'STANDALONE';
+
+      function escapeHtml(value) {
+        return String(value ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function render(fields) {
+        const container = document.querySelector('[data-custom-fields-fields]');
+        if (!container) return;
+
+        if (!Array.isArray(fields) || fields.length === 0) {
+          container.innerHTML = '<p class="text-sm text-muted-foreground">Nenhum campo adicional necessario.</p>';
+          return;
+        }
+
+        container.innerHTML = fields
+          .map((field) => {
+            const fieldName = escapeHtml(field.name);
+            const fieldLabel = escapeHtml(field.label || field.description || field.name);
+            const requiredMark = field.required ? "<span class='text-red-500 ml-1'>*</span>" : '';
+            const requiredAttr = String(!!field.required);
+
+            const control =
+              field.type === 'SELECT'
+                ? `<select id="${fieldName}" class="w-full h-10 data-[state=error]:border-red-500 focus-visible:data-[state=error]:ring-red-500" data-required="${requiredAttr}">
+                    ${(field.options || [])
+                      .map((opt) => {
+                        const label = escapeHtml(opt.label ?? opt.name ?? opt.id);
+                        const price = opt.price ? ` (${CentralCart.formatPrice(opt.price, store.currency)})` : '';
+                        return `<option value="${escapeHtml(opt.id)}">${label}${price}</option>`;
+                      })
+                      .join('')}
+                  </select>`
+                : `<input
+                    type="${field.type === 'NUMBER' && standaloneNumberInputs ? 'number' : 'text'}"
+                    ${field.type === 'NUMBER' ? 'inputmode="numeric" pattern="[0-9]*"' : ''}
+                    id="${fieldName}"
+                    placeholder="${escapeHtml(field.placeholder || '')}"
+                    class="w-full h-10 data-[state=error]:border-red-500 focus-visible:data-[state=error]:ring-red-500 ${field.type === 'ROBLOX' ? 'pl-8' : ''} ${field.type === 'NUMBER' && !standaloneNumberInputs ? 'number-only' : ''}"
+                    ${typeof field.max === 'number' ? `maxlength="${field.max}"` : ''}
+                    ${typeof field.min === 'number' ? `minlength="${field.min}"` : ''}
+                    data-required="${requiredAttr}"
+                  />`;
+
+            const robloxSearchIcon =
+              field.type === 'ROBLOX'
+                ? '<i data-lucide="search" class="size-5 absolute left-2 text-muted-foreground pointer-events-none"></i><img id="roblox-input-avatar-' +
+                  fieldName +
+                  '" class="size-5 absolute left-2 rounded-full hidden" />'
+                : '<i data-lucide="search" class="size-5 absolute left-2 text-muted-foreground pointer-events-none hidden"></i>';
+            const robloxLoader =
+              field.type === 'ROBLOX'
+                ? `<div id="roblox-loader-${fieldName}" class="absolute right-3 text-muted-foreground hidden"><i data-lucide="loader" class="size-4 animate-spin"></i></div>`
+                : '';
+            const robloxResult =
+              field.type === 'ROBLOX'
+                ? `<div id="roblox-result-${fieldName}" class="flex items-center justify-between gap-3 p-2 border rounded-cc bg-background hidden">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <img id="roblox-avatar-${fieldName}" class="size-8 rounded-full object-cover"/>
+                      <div class="min-w-0">
+                        <p id="roblox-name-${fieldName}" class="text-sm font-medium truncate">&nbsp;</p>
+                        <p id="roblox-username-${fieldName}" class="text-xs text-muted-foreground truncate">&nbsp;</p>
+                      </div>
+                    </div>
+                    <button id="roblox-select-${fieldName}" type="button" class="btn-secondary h-8 px-3">Selecionar</button>
+                  </div>`
+                : '';
+
+            return `<div class="space-y-2" data-field-id="${fieldName}" data-field-type="${escapeHtml(field.type)}">
+              <label for="${fieldName}" class="text-sm font-medium leading-none flex items-center">${fieldLabel}${requiredMark}</label>
+              <div class="relative flex items-center w-full">
+                ${robloxSearchIcon}
+                ${control}
+                ${robloxLoader}
+              </div>
+              <p id="error-${fieldName}" class="mt-1 text-xs text-red-500 hidden"></p>
+              ${robloxResult}
+            </div>`;
+          })
+          .join('');
+
+        if (typeof window.CustomFields?.afterRender === 'function') {
+          window.CustomFields.afterRender(container);
+        }
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      window.CustomFields = Object.assign(window.CustomFields || {}, { render });
+    })();
+  </script>
+
+  <main class="flex-1"><% block %><% endblock %></main>
+
+  <% render "components/footer" %>
+
+  <script>
+    const store = {
+      currency: '<%= store.currency %>',
+    };
+  </script>
+
+  <script>
+    function updateDrawerItems() {
+      const cartDrawer = document.getElementById('cart-drawer');
+      const drawerWrapper = document.getElementById('cart-drawer-wrapper');
+    
+      const cartPackages = Cart.getPackages();
+
+      if (cartPackages.length < 1) {
+        drawerWrapper.innerHTML = `
+          <div class="h-full flex flex-col">
+            <div class="my-auto text-center flex flex-col items-center">
+              <i data-lucide="shopping-cart" class="w-10 h-10 text-primary"></i>
+              <p class="text-lg font-semibold">Seu carrinho est&aacute; vazio.</p>
+              <p class="text-sm text-muted-foreground">Assim que voc&ecirc; escolher um produto, ele aparecer&aacute; aqui!</p>
+            </div>
+          </div>
+        `;
+      } else {
+        drawerWrapper.innerHTML = cartPackages.map((package) => `
+          <div class="flex flex-wrap gap-4 items-center justify-between text-sm" data-package-id="${package.id}">
+            <div class="flex gap-4 items-center">
+              <img class="object-cover w-16 h-16 rounded-md" src="${package.image ? package.image : '<%= 'public/assets/templates/KOPY/no-image.png' | cdn %>'}" />
+              <div class="w-[150px]">
+                <h5 class="leading-4 font-semibold line-clamp-2" title="${package.name}">${package.name}</h5>
+                <p class="text-lg font-medium tracking-tight text-muted-foreground">
+                  ${CentralCart.formatPrice(package.pricing.price, store.currency)}
+                </p>
+              </div>
+            </div>
+
+            <div id="cart-actions-${package.id}" class="flex gap-2 items-center data-[loading]:opacity-60 data-[loading]:pointer-events-none">
+              <button
+                class="border rounded-md w-8 h-8 flex items-center justify-center disabled:opacity-50"
+                data-cart-action="decrease"
+                data-min-amount="${package.stock.min_amount}"
+                ${package.stock.min_amount && package.cart_item.quantity <= package.stock.min_amount ? 'disabled' : ''}
+              >
+                <i data-lucide="minus" class="w-4 h-4"></i>
+              </button>
+
+              <input data-cart-action="input" autocomplete="off" value="${package.cart_item.quantity}" class="w-10 h-8 text-center px-0" />
+
+              <button data-cart-action="increase" class="border rounded-md w-8 h-8 flex items-center justify-center">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+              </button>
+
+              <button data-cart-action="remove" class="border rounded-md w-8 h-8 flex items-center justify-center bg-red-500">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const pricing = cartDrawer.querySelector("#cart-pricing");
+      if (Cart.getPackages().length < 1) {
+        pricing.style.display = "none";
+      } else {
+        pricing.style.display = "flex";
+        pricing.querySelector("span").innerHTML = CentralCart.formatPrice(Cart.calculateTotal(), store.currency);
+      }
+
+      lucide.createIcons();
+      initCartActionListeners(cartDrawer);
+    }
+  </script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script>
+    lucide.createIcons();
+  </script>
+
+  <script src="<%= centralcart_script %>"></script>
+  <script src="/scripts/custom-fields.js?v=<%= asset_version %>"></script>
+  <script src="/scripts/main.js?v=<%= asset_version %>"></script>
+  <script src="/scripts/cart.js?v=<%= asset_version %>"></script>
+  <script src="/scripts/dialog.js?v=<%= asset_version %>"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/keen-slider@latest/keen-slider.min.js"></script>
+
+  <% assign scripts_arr = scripts | split: ', ' %>
+  <% if scripts_arr %>
+    <% for src in scripts_arr %>
+      <script src="<%= src %><% unless src contains 'http' or src contains '?' %>?v=<%= asset_version %><% endunless %>"></script>
+    <% endfor %>
+  <% endif %>
+</body>
+</html>
+

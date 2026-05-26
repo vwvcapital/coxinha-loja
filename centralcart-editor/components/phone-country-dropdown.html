@@ -1,0 +1,193 @@
+<div class="relative shrink-0">
+  <button
+    type="button"
+    class="flex items-center gap-1.5 h-10 px-2.5 border rounded-cc bg-background text-sm cursor-pointer whitespace-nowrap"
+    id="phone-country-button"
+    data-selected-country="BR"
+    onclick="handlePhoneCountryMenu()"
+  >
+    <span id="phone-country-flag">&#x1F1E7;&#x1F1F7;</span>
+    <span id="phone-country-dial">+55</span>
+    <svg class="size-3 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+  </button>
+
+  <div
+    class="max-h-48 overflow-y-auto absolute bottom-[calc(100%+0.25rem)] left-0 bg-background p-1 rounded-cc
+    border border-foreground/10 w-52 origin-bottom-left
+    scale-75 transition-all invisible opacity-0 duration-200"
+    id="phone-country-menu"
+  >
+    <% for country in phone_countries %>
+    <button type="button" data-code="<%= country.code %>" data-dial="<%= country.dial %>" data-flag="<%= country.flag %>" class="flex items-center gap-2 w-full px-2.5 py-1.5 text-sm hover:bg-muted cursor-pointer text-left rounded-sm">
+      <span><%= country.flag %></span>
+      <span class="flex-1"><%= country.name %></span>
+      <span class="text-muted-foreground text-xs"><%= country.dial %></span>
+    </button>
+    <% endfor %>
+  </div>
+</div>
+
+<script>
+  const phoneCountryMenu = document.getElementById("phone-country-menu")
+  const phoneCountryButton = document.getElementById("phone-country-button")
+
+  function openPhoneCountryMenu() {
+    phoneCountryButton.setAttribute("data-state", "open")
+
+    phoneCountryMenu.classList.remove("invisible")
+    setTimeout(() => {
+      phoneCountryMenu.classList.add("scale-100", "opacity-100")
+    }, 1);
+  }
+
+  function closePhoneCountryMenu() {
+    phoneCountryButton.setAttribute("data-state", "closed")
+
+    phoneCountryMenu.classList.remove("scale-100", "opacity-100")
+    phoneCountryMenu.classList.add("scale-75", "opacity-0")
+    setTimeout(() => {
+      phoneCountryMenu.classList.add("invisible")
+    }, 199);
+  }
+
+  function handlePhoneCountryMenu() {
+    if (phoneCountryMenu.classList.contains("invisible")) {
+      openPhoneCountryMenu()
+    } else {
+      closePhoneCountryMenu()
+    }
+  }
+
+  window.addEventListener("click", (event) => {
+    const isClickInsideMenu = phoneCountryMenu.contains(event.target);
+    const isClickOnButton = phoneCountryButton.contains(event.target);
+
+    if (!isClickInsideMenu && !isClickOnButton) {
+      closePhoneCountryMenu();
+    }
+  });
+
+  phoneCountryMenu.querySelectorAll("[data-code]").forEach((item) => {
+    item.addEventListener("click", () => {
+      document.getElementById("phone-country-flag").textContent = item.dataset.flag;
+      document.getElementById("phone-country-dial").textContent = item.dataset.dial;
+      phoneCountryButton.dataset.selectedCountry = item.dataset.code;
+      closePhoneCountryMenu();
+      phoneCountryButton.dispatchEvent(new CustomEvent("countrychange"));
+    });
+  });
+
+  // Phone number utilities (libphonenumber-js)
+  const PhoneInput = (() => {
+    let initialized = false;
+    let prevDigits = '';
+    let lib = null;
+    let libLoading = null;
+
+    function loadLib() {
+      if (lib) return Promise.resolve(lib);
+      if (libLoading) return libLoading;
+      libLoading = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/libphonenumber-js@1/bundle/libphonenumber-js.min.js';
+        s.onload = () => { lib = window.libphonenumber; resolve(lib); };
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+      return libLoading;
+    }
+
+    function format(value, countryCode) {
+      if (!lib || !value) return value || '';
+      const digits = value.replace(/\D/g, '');
+      if (!digits) return '';
+      return new lib.AsYouType(countryCode).input(digits);
+    }
+
+    function toE164(value, countryCode) {
+      if (!value) return '';
+      if (!lib) return value;
+      try {
+        const p = lib.parsePhoneNumber(value, countryCode);
+        return p?.format('E.164') || value;
+      } catch { return value; }
+    }
+
+    function getCountryCode() {
+      return phoneCountryButton?.dataset?.selectedCountry || 'BR';
+    }
+
+    function init(wrapper) {
+      if (initialized) return;
+      initialized = true;
+
+      const input = wrapper.querySelector('input[name="client_phone"]');
+      if (!input) return;
+
+      phoneCountryButton.addEventListener('countrychange', () => {
+        input.value = format(input.value, getCountryCode());
+        prevDigits = input.value.replace(/\D/g, '');
+      });
+
+      loadLib()
+        .then(() => {
+          input.addEventListener('input', (e) => {
+            const cursorPos = input.selectionStart || 0;
+            const currentDigits = input.value.replace(/\D/g, '');
+            const isBackspace = e.inputType === 'deleteContentBackward';
+            const isDelete = e.inputType === 'deleteContentForward';
+
+            let newDigits = currentDigits;
+            let targetDigitsBefore;
+
+            if (
+              (isBackspace || isDelete) &&
+              currentDigits === prevDigits &&
+              currentDigits.length > 0
+            ) {
+              const textBefore = input.value.slice(0, cursorPos);
+              const digitsBefore = textBefore.replace(/\D/g, '').length;
+
+              if (isBackspace) {
+                const removeAt = Math.max(0, digitsBefore - 1);
+                newDigits = currentDigits.slice(0, removeAt) + currentDigits.slice(removeAt + 1);
+                targetDigitsBefore = removeAt;
+              } else {
+                newDigits =
+                  currentDigits.slice(0, digitsBefore) + currentDigits.slice(digitsBefore + 1);
+                targetDigitsBefore = digitsBefore;
+              }
+            } else {
+              targetDigitsBefore = input.value.slice(0, cursorPos).replace(/\D/g, '').length;
+            }
+
+            const formatted = newDigits ? format(newDigits, getCountryCode()) : '';
+            input.value = formatted;
+            prevDigits = formatted.replace(/\D/g, '');
+
+            let newCursorPos = 0;
+            let digitsSeen = 0;
+            if (targetDigitsBefore > 0) {
+              for (let i = 0; i < formatted.length; i++) {
+                if (/\d/.test(formatted[i])) {
+                  digitsSeen++;
+                  if (digitsSeen === targetDigitsBefore) {
+                    newCursorPos = i + 1;
+                    break;
+                  }
+                }
+              }
+              if (digitsSeen < targetDigitsBefore) newCursorPos = formatted.length;
+            }
+
+            input.setSelectionRange(newCursorPos, newCursorPos);
+          });
+        })
+        .catch(() => {
+          console.warn('[PhoneInput] Failed to load libphonenumber-js');
+        });
+    }
+
+    return { init, getCountryCode, toE164 };
+  })();
+</script>

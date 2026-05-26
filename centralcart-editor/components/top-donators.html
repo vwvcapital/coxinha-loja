@@ -1,0 +1,77 @@
+<% load "widget", type: "top_donators" %>
+<% load "widget", type: "connection_board" %>
+
+<section class="w-full relative overflow-hidden">
+  <div class="flex justify-between flex-col md:flex-row items-center p-6 px-6 rounded-xl bg-gradient-to-r from-muted to-primary/80 from-30% text-center">
+    
+    <div class="text-center md:text-left">
+      <h2 class="text-2xl font-bold leading-tight">
+        <% if store.type=='STANDALONE' %>
+          Compradores do mês
+        <% else %>
+          Doadores do mês
+        <% endif %>
+      </h2>
+      <p class="text-muted-foreground text-base">
+        Veja quem mais contribuiu com o nosso servidor!
+      </p>
+      <button id="copy-ip" onclick="handleCopyIpToClipboard('<%= widget.connection_board.address %>', '<%= store.type %>')" class="btn-primary mt-3 max-md:mx-auto">
+        <i data-lucide="external-link" class="size-4"></i>
+        <span class="text-sm">Acesse o servidor</span>
+      </button>
+    </div>
+
+    <% if widget.top_donators.data.length > 0 %>
+      <div class="flex justify-end gap-8 items-end w-full max-w-3xl max-md:mt-10 max-md:p-0 max-md:justify-center max-md:gap-4">
+        <% for donator in widget.top_donators.data %>
+          <% if forloop.index0 == 0 %>
+            <div class="relative flex flex-col items-center gap-3 order-2">
+              <div class="relative w-20 h-20 rounded-full border-2 border-primary/60 bg-gradient-to-br from-primary/20 to-primary/40 flex justify-center items-center shadow-lg shadow-primary/20">
+                <img src="<%= '/public/assets/images/medal-1.png' | cdn %>" alt="medal" class="w-10 h-auto">
+                <div class="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-primary border-2 border-background flex items-center justify-center text-xs font-bold">
+                  1
+                </div>
+              </div>
+              <div class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-primary/30 to-primary/50 border border-primary/60 text-foreground font-bold text-sm whitespace-nowrap shadow-md">
+                <%= donator.username %>
+              </div>
+              <% if widget.top_donators.show_amount %>
+                <p class="font-semibold text-base text-foreground"><%= donator.spent %></p>
+              <% endif %>
+            </div>
+          <% elsif forloop.index0 == 1 %>
+            <div class="relative flex flex-col items-center gap-2.5 order-1">
+              <div class="relative w-16 h-16 rounded-full border-2 border-primary/40 bg-gradient-to-br from-primary/15 to-primary/30 flex justify-center items-center shadow-md">
+                <img src="<%= '/public/assets/images/medal-2.png' | cdn %>" alt="medal" class="w-8 h-auto">
+                <div class="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-primary/80 border-2 border-background flex items-center justify-center text-[10px] font-bold">
+                  2
+                </div>
+              </div>
+              <div class="px-2.5 py-1 rounded-lg bg-primary/20 border border-primary/40 text-foreground font-semibold text-xs whitespace-nowrap">
+                <%= donator.username %>
+              </div>
+              <% if widget.top_donators.show_amount %>
+                <p class="font-medium text-sm text-foreground"><%= donator.spent %></p>
+              <% endif %>
+            </div>
+          <% elsif forloop.index0 == 2 %>
+            <div class="relative flex flex-col items-center gap-2.5 order-3">
+              <div class="relative w-16 h-16 rounded-full border-2 border-primary/40 bg-gradient-to-br from-primary/15 to-primary/30 flex justify-center items-center shadow-md">
+                <img src="<%= '/public/assets/images/medal-3.png' | cdn %>" alt="medal" class="w-8 h-auto">
+                <div class="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-primary/80 border-2 border-background flex items-center justify-center text-[10px] font-bold">
+                  3
+                </div>
+              </div>
+              <div class="px-2.5 py-1 rounded-lg bg-primary/20 border border-primary/40 text-foreground font-semibold text-xs whitespace-nowrap">
+                <%= donator.username %>
+              </div>
+              <% if widget.top_donators.show_amount %>
+                <p class="font-medium text-sm text-foreground"><%= donator.spent %></p>
+              <% endif %>
+            </div>
+          <% endif %>
+        <% endfor %>
+      </div>
+    <% endif %>
+  </div>
+</section>

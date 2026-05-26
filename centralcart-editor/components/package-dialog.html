@@ -1,0 +1,99 @@
+<% capture dialog_content %>
+  <% assign has_variations = package.is_variation_parent and package.variations.size > 0 %>
+  <% centralcart
+    assign display_package = package
+    
+    if package.is_variation_parent and package.variations.size > 0
+      assign first_variation = package.variations | first
+      assign display_package = first_variation
+    endif
+  centralcart %>
+  
+  <div
+    class="flex flex-col gap-5"
+    data-package-dialog
+    data-package-id="<%= package.id %>"
+    data-has-variations="<% if has_variations %>true<% else %>false<% endif %>"
+  >
+    <% if package_description %>
+      <div class="max-h-64 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
+        <div class="text-sm text-muted-foreground leading-relaxed prose prose-invert max-w-none">
+          <%= package_description %>
+        </div>
+      </div>
+    <% endif %>
+
+    <% if has_variations %>
+      <div class="flex flex-col gap-3" data-dialog-variation-container>
+        <span class="text-sm font-semibold text-muted-foreground">Selecione uma variação</span>
+        <% render 'components/variations-list', package: package, display_package: package %>
+        <p class="text-xs font-medium text-amber-400" data-dialog-selection-warning>Escolha uma opção para continuar.</p>
+      </div>
+    <% endif %>
+
+    <div class="-mx-6 -mb-6 flex items-center justify-between px-6 py-4 gap-4 bg-muted">
+      <div class="flex flex-col">
+        <span class="text-sm italic text-muted-foreground font-medium">pague:</span>
+        <strong
+          class="text-2xl font-black text-primary leading-none"
+          data-dialog-price
+          data-base-price="<%= package.pricing.price | default: modal_price %>"
+          data-base-price-label="<%= modal_price | format_price %><% if has_variations %>+<% endif %>"
+        >
+          <%= modal_price | format_price %><% if has_variations %>+<% endif %>
+        </strong>
+      </div>
+
+      <div class="flex justify-end">
+        <button type="button" class="btn-primary h-12 px-6 text-base rounded-full"
+          data-package-card-button
+          data-package-id="<%= package.id %>"
+          data-text-default="Comprar"
+          data-text-active="Ver carrinho"
+          data-text-out-of-stock="Sem estoque"
+          data-stock='<%= package.stock.available %>'
+          data-state="default"
+          data-dialog-id="<%= dialog_id %>"
+          data-button-context="dialog"
+          data-has-variations="<% if has_variations %>true<% else %>false<% endif %>"
+          <% if package.stock.available == false %>disabled<% endif %>
+        >
+          <i data-lucide="shopping-cart" class="h-5 w-5"></i>
+          <span data-button-label>Comprar</span>
+        </button>
+      </div>
+    </div>
+
+    <% if has_variations %>
+      <script type="application/json" data-package-variations="<%= package.id %>"><%= package.variations | json %></script>
+    <% endif %>
+    <script type="application/json" data-package-fields="<%= package.id %>"><%= display_package.fields | json %></script>
+  </div>
+<% endcapture %>
+
+<% render 'components/dialog', id: dialog_id, title: package.name, content: dialog_content, width: '600px' %>
+
+<script>
+  (function () {
+    const container = document.querySelector('[data-custom-fields-fields]');
+
+    function render(fields) {
+      if (!container) return;
+
+      if (!Array.isArray(fields) || fields.length === 0) {
+        container.innerHTML = '<p class="text-sm text-muted-foreground">Nenhum campo adicional necessário.</p>';
+        return;
+      }
+
+      const html = fields
+        .map((field) => `<% render 'components/custom-field' %>`)
+        .join('');
+
+      container.innerHTML = html;
+
+      window.CustomFields.afterRender(container);
+    }
+
+    window.CustomFields = Object.assign(window.CustomFields || {}, { render });
+  })();
+</script>

@@ -1,0 +1,220 @@
+<% layout "layouts/layout", scripts: '/scripts/affiliate.js', page_title: 'Afiliados' %>
+<% load 'affiliate' %>
+
+<div class="container py-12 min-h-screen">
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <div class="lg:col-span-1">
+      <% render 'components/account-sidebar' %>
+    </div>
+
+    <div class="lg:col-span-3 space-y-6">
+      <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold">Área do afiliado</h1>
+      </div>
+
+      <% if affiliate.status == 'affiliate' %>
+        <div class="border rounded-cc p-6 bg-muted backdrop-blur-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-semibold">Resumo</h3>
+              <p class="text-sm text-muted-foreground">Informações sobre suas vendas e comissões.</p>
+            </div>
+            <button onclick="openDialog('withdraw-settings')" class="btn-secondary h-8">Configurar</button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="border border-white/10 rounded-cc p-4 bg-background/50 flex flex-col justify-between gap-1">
+              <p class="text-sm text-muted-foreground">Carteira</p>
+              <div class="flex items-end justify-between">
+                <p class="text-xl font-semibold leading-none"><%= affiliate.balance | default: 0 | format_price %></p>
+                <button onclick="openDialog('withdraw')" class="btn-outline h-8">Sacar</button>
+              </div>
+              <% if affiliate.min_withdraw %>
+                <p class="text-xs text-muted-foreground mt-1">Mínimo: <%= affiliate.min_withdraw | format_price %></p>
+              <% endif %>
+            </div>
+            <div class="border border-white/10 rounded-cc p-4 bg-background/50 flex flex-col justify-between gap-1">
+              <p class="text-sm text-muted-foreground">Comissão</p>
+              <p class="text-xl font-semibold leading-none"><%= affiliate.percent_commission %>%</p>
+            </div>
+            <div class="border border-white/10 rounded-cc p-4 bg-background/50 flex flex-col justify-between gap-1">
+              <p class="text-sm text-muted-foreground">Vendas</p>
+              <p class="text-xl font-semibold leading-none"><%= affiliate.stats.total_sales | default: 0 %></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="border rounded-cc p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-muted backdrop-blur-sm">
+          <div class="space-y-1">
+            <h3 class="font-semibold">Link de afiliado</h3>
+            <p class="text-sm text-muted-foreground">
+              Compartilhe seu link de afiliado para ganhar comissões
+            </p>
+          </div>
+
+          <% if affiliate.links and affiliate.links.size > 0 %>
+            <% assign link = affiliate.links[0] %>
+            <div class="w-full md:w-1/2 space-y-2">
+              <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <input
+                  class="bg-muted border-dashed h-9 w-full rounded-cc px-3 text-xs sm:text-sm"
+                  readonly
+                  value="<%= link.url %>"
+                />
+                <button
+                  type="button"
+                  class="btn-primary h-9 px-3 sm:px-4 w-full sm:w-auto justify-center group"
+                  data-action="copy"
+                  data-content="<%= link.url %>"
+                  data-is-copied="false"
+                >
+                  <i data-lucide="check" class="size-4 hidden group-data-[is-copied=true]:block"></i>
+                  <i data-lucide="copy" class="size-4 hidden group-data-[is-copied=false]:block"></i>
+                  <span>Copiar</span>
+                </button>
+              </div>
+              <p class="text-xs text-muted-foreground md:text-right">
+                <span class="text-primary font-medium"><%= affiliate.stats.d7_visits %> visitas</span>
+                pelo seu link nos últimos 7 dias.
+              </p>
+            </div>
+          <% else %>
+            <p class="text-sm text-muted-foreground">Nenhum link encontrado.</p>
+          <% endif %>
+        </div>
+
+        <div class="border rounded-cc p-6 bg-muted backdrop-blur-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold">Transações</h3>
+          </div>
+          <% if affiliate.transactions and affiliate.transactions.data and affiliate.transactions.data.size > 0 %>
+            <div class="space-y-0">
+              <% for transaction in affiliate.transactions.data %>
+                <% render 'components/affiliate-transaction-item', transaction: transaction %>
+              <% endfor %>
+            </div>
+          <% else %>
+            <div class="text-center py-8">
+              <p class="text-sm text-muted-foreground">Nenhuma transação encontrada.</p>
+            </div>
+          <% endif %>
+          <% if affiliate.transactions and affiliate.transactions.meta %>
+            <% render 'components/pagination', meta: affiliate.transactions.meta %>
+          <% endif %>
+        </div>
+      <% elsif affiliate.status == 'not_affiliate' %>
+        <div class="border rounded-cc p-6 bg-muted text-center backdrop-blur-sm">
+          <div class="w-20 h-20 mx-auto mb-6 bg-muted rounded-full flex items-center justify-center">
+            <i data-lucide="user-plus" class="text-3xl text-muted-foreground"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Você não é afiliado</h3>
+          <p class="text-muted-foreground mb-8 max-w-md mx-auto">
+            Você não é afiliado. Clique no botão abaixo e se torne afiliado da loja.
+          </p>
+          <button
+            type="button"
+            class="btn-primary px-4 w-fit mx-auto h-9 flex items-center gap-2"
+            onclick="openDialog('become-affiliate')"
+          >
+            <i data-lucide="user-plus" class="size-4"></i>
+            <span>Tornar-se afiliado</span>
+          </button>
+        </div>
+      <% elsif affiliate.status == 'restricted' or affiliate.status == 'unauthorized' %>
+        <div class="border rounded-cc p-6 bg-muted backdrop-blur-sm text-center">
+          <div class="w-20 h-20 mx-auto mb-6 bg-muted rounded-full flex items-center justify-center">
+            <i data-lucide="lock" class="text-3xl text-muted-foreground"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Acesso restrito</h3>
+          <p class="text-muted-foreground mb-8 max-w-md mx-auto">
+            Esta é uma página restrita apenas para afiliados.
+          </p>
+        </div>
+      <% endif %>
+    </div>
+  </div>
+</div>
+
+<% if affiliate.status == 'affiliate' %>
+  <% render 'components/affiliate-settings-dialog', affiliate: affiliate %>
+  
+  <% capture content %>
+    <form id="withdraw-form" onsubmit="event.preventDefault(); requestWithdraw();">
+      <div class="space-y-4">
+        <div>
+          <label class="text-sm font-medium mb-2 block">Valor do saque</label>
+          <div class="relative">
+             <input
+              type="text"
+              id="withdraw-amount"
+              name="amount"
+              required
+              inputmode="numeric"
+              class="w-full h-9 bg-muted"
+              placeholder="50,00"
+              oninput="formatCurrencyInput(this)"
+            />
+          </div>
+          <div class="mt-2 space-y-1">
+            <p class="text-xs text-muted-foreground">
+              Saldo disponível: <span id="available-balance"><%= affiliate.balance | default: 0 | format_price %></span>
+            </p>
+            <% if affiliate.min_withdraw %>
+              <p class="text-xs text-muted-foreground">
+                Valor mínimo: <span data-min-withdraw="<%= affiliate.min_withdraw %>"><%= affiliate.min_withdraw | format_price %></span>
+              </p>
+            <% endif %>
+          </div>
+        </div>
+        <div class="flex gap-3 justify-end pt-4">
+          <button type="button" onclick="closeDialog('withdraw')" class="btn-outline h-9">Cancelar</button>
+          <button type="submit" class="btn-primary h-9">Solicitar saque</button>
+        </div>
+      </div>
+    </form>
+  <% endcapture %>
+  <% render 'components/dialog', id: 'withdraw', title: 'Solicitar saque', content: content %>
+
+  <% capture content %>
+    <p id="transaction-message-content" class="text-sm bg-muted rounded-cc p-4 border text-muted-foreground whitespace-pre-wrap"></p>
+    <div class="flex justify-end mt-6">
+      <button onclick="closeDialog('transaction-message')" class="btn-outline h-9">Fechar</button>
+    </div>
+  <% endcapture %>
+  <% render 'components/dialog', id: 'transaction-message', title: 'Mensagem da transação', content: content %>
+<% endif %>
+
+<% capture content %>
+  <form id="become-affiliate-form" onsubmit="submitBecomeAffiliate(event)">
+    <div class="space-y-4">
+      <div>
+        <label for="affiliate-ref-code" class="text-sm font-medium mb-2 block">
+          Escolha o código do seu link
+        </label>
+         <input
+           type="text"
+           id="affiliate-ref-code"
+           name="ref_code"
+           class="w-full h-10 bg-muted border border-white/10 rounded-cc px-3"
+           required
+         />
+        <p class="text-xs text-muted-foreground mt-2">
+          Esse código será usado no seu link de afiliado exclusivo.
+        </p>
+         <p class="text-xs text-muted-foreground">
+           Utilize apenas letras e números.
+        </p>
+      </div>
+      <div class="flex justify-end gap-3 pt-2">
+        <button type="button" class="btn-outline h-9" onclick="closeDialog('become-affiliate')">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-primary h-9 flex items-center gap-2">
+          <span>Confirmar</span>
+        </button>
+      </div>
+    </div>
+  </form>
+<% endcapture %>
+<% render 'components/dialog', id: 'become-affiliate', title: 'Tornar-se afiliado', content: content %>
+

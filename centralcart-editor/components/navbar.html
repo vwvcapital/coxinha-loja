@@ -1,0 +1,110 @@
+<% assign active_category_slug = '' %>
+<% if category %>
+  <% assign active_category_slug = category.slug %>
+<% endif %>
+
+<% assign first_category = categories | first %>
+<% assign header_store_url = '/' %>
+
+<nav class="coxinha-nav" aria-label="Navegacao principal">
+  <div class="store-stage coxinha-nav-stage">
+    <div class="mobile-store-header">
+      <a href="/" class="mobile-store-logo" aria-label="<%= store.name %>">
+        <% if theme.logo != blank %>
+          <img src="<%= theme.logo %>" alt="<%= store.name %>">
+        <% else %>
+          <span>CS</span>
+        <% endif %>
+      </a>
+      <div class="mobile-store-actions">
+        <button onclick="toggleMobileMenu()" class="coxinha-icon-btn" type="button" aria-label="Abrir menu">
+          <i data-lucide="menu" class="size-4"></i>
+        </button>
+        <% if config.show_search %>
+          <button onclick="toggleMobileSearch()" class="coxinha-icon-btn" type="button" aria-label="Buscar produto">
+            <i data-lucide="search" class="size-4"></i>
+          </button>
+        <% endif %>
+        <button onclick="openCart();" class="coxinha-icon-btn open-cart cart-nav-trigger cart-empty" type="button" aria-label="Abrir carrinho">
+          <i data-lucide="shopping-cart" class="size-4"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="category-sidebar" aria-label="Categorias da loja">
+      <% if categories and categories.size > 0 %>
+        <% for category_item in categories %>
+          <% assign category_url = '#categoria-' | append: category_item.slug %>
+          <% assign is_active = false %>
+          <% if active_category_slug == category_item.slug %>
+            <% assign is_active = true %>
+          <% endif %>
+          <% if category_item.sub_categories and category_item.sub_categories.size > 0 %>
+            <% for sub_category in category_item.sub_categories %>
+              <% if active_category_slug == sub_category.slug %>
+                <% assign is_active = true %>
+              <% endif %>
+            <% endfor %>
+          <% endif %>
+
+          <a href="<%= category_url %>" class="category-link <% if is_active %>active<% endif %>" data-category-scroll>
+            <span class="category-mark" aria-hidden="true"><%= category_item.name | slice: 0, 1 %></span>
+            <span><span class="category-label"><%= category_item.name %></span></span>
+          </a>
+        <% endfor %>
+      <% else %>
+        <a href="/store" class="category-link active">
+          <span class="category-mark" aria-hidden="true">C</span>
+          <span><span class="category-label">Catalogo</span></span>
+        </a>
+      <% endif %>
+    </div>
+
+    <div class="coxinha-nav-actions cart-navbar cart-empty">
+      <button onclick="openCart();" class="coxinha-icon-btn open-cart cart-nav-trigger cart-empty" type="button" aria-label="Abrir carrinho">
+        <i data-lucide="shopping-cart" class="size-4"></i>
+        <span class="cart-navbar-label">Carrinho</span>
+      </button>
+    </div>
+
+    <% if config.show_search %>
+      <div id="mobile-search-container" class="coxinha-mobile-search hidden">
+        <i data-lucide="search" class="size-4"></i>
+        <input autocomplete="off" id="search-bar-mobile" placeholder="Buscar produto" />
+        <div id="search-result-mobile" class="coxinha-search-result hidden"></div>
+      </div>
+    <% endif %>
+  </div>
+</nav>
+
+<div id="mobile-drawer" class="w-screen h-dvh flex items-start z-[100] fixed top-0 left-0 hidden md:hidden" data-state="closed" onclick="closeMobileMenu()">
+  <div id="mobile-drawer-content" class="h-full w-full bg-background border-r" onclick="event.stopPropagation()">
+    <div class="flex flex-col h-full">
+      <div class="flex items-center justify-between p-5 border-b border-white/10">
+        <div class="flex items-center gap-3 min-w-0">
+          <% if theme.logo != blank %>
+            <img src="<%= theme.logo %>" alt="<%= store.name %>" class="size-10 rounded-full object-cover bg-primary">
+          <% else %>
+            <span class="mobile-drawer-logo-fallback">CS</span>
+          <% endif %>
+          <h2 class="text-lg font-black text-white truncate"><%= store.name %></h2>
+        </div>
+        <button onclick="closeMobileMenu()" class="coxinha-icon-btn" type="button" aria-label="Fechar menu">
+          <i data-lucide="x" class="size-5"></i>
+        </button>
+      </div>
+
+      <nav class="flex-1 overflow-y-auto p-4">
+        <ul class="space-y-2">
+          <li><a href="<%= header_store_url %>" class="mobile-drawer-link"><i data-lucide="store" class="size-5"></i><span>Loja</span></a></li>
+          <li>
+            <button onclick="openCart(); closeMobileMenu();" class="mobile-drawer-link w-full" type="button">
+              <i data-lucide="shopping-cart" class="size-5"></i>
+              <span>Carrinho</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

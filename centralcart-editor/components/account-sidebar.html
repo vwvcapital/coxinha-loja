@@ -1,0 +1,40 @@
+<% load 'affiliate_settings' %>
+
+<div class="bg-muted backdrop-blur-sm border border-foreground/10 rounded-cc p-6 sticky top-24">
+  <div class="text-center mb-4 pb-6 border-b border-foreground/10">
+    <% if user and user.avatar %>
+      <img src="<%= user.avatar %>" class="size-20 rounded-full object-cover mx-auto mb-4" alt="<%= user.name %>" />
+    <% else %>
+      <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="user" class="size-12"></i>
+      </div>
+    <% endif %>
+    <h3 class="font-semibold text-lg mb-1">Meu perfil</h3>
+    <p class="text-sm text-muted-foreground">Área do cliente</p>
+  </div>
+
+  <nav>
+    <div class="mb-4 space-y-2">
+      <a href="/account/orders" class="btn-ghost justify-start h-10 <% if pathname == '/account/orders' %>bg-primary hover:bg-primary/80<% endif %>">
+        <i data-lucide="package" class="size-5"></i>
+        Minhas compras
+      </a>
+      <% if affiliate_settings.status == 'affiliate' or affiliate_settings.allow_self_affiliate == true %>
+        <a href="/account/affiliate" class="btn-ghost justify-start h-10 <% if pathname == '/account/affiliate' %>bg-primary hover:bg-primary/80<% endif %>">
+          <i data-lucide="users" class="size-5"></i>
+          Área do afiliado
+        </a>
+      <% endif %>
+    </div>
+
+    <div class="h-px bg-foreground/10 w-full"></div>
+    
+    <div class="mt-4">
+      <a href="/" class="btn-ghost text-muted-foreground justify-start h-10 hover:text-foreground">
+        <i data-lucide="home" class="size-5"></i>
+        Voltar para a loja
+      </a>
+    </div>
+  </nav>
+</div>
+

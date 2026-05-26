@@ -1,0 +1,32 @@
+<div class="flex flex-wrap gap-4 items-center justify-between text-sm" data-package-id="${package.id}">
+  <div class="flex gap-4 items-center">
+    <img class="object-cover w-16 h-16 rounded-md" src="${package.image ? package.image : `<%= 'public/assets/templates/KOPY/no-image.png' | cdn %>`}" />
+    <div class="w-[150px]">
+      <h5 class="leading-4 font-semibold line-clamp-2" title="${package.name}">${package.name}</h5>
+      <p class="text-lg font-medium tracking-tight text-muted-foreground">
+        ${CentralCart.formatPrice(package.pricing.price, store.currency)}
+      </p>
+    </div>
+  </div>
+
+  <div id="cart-actions-${package.id}" class="flex gap-2 items-center data-[loading]:opacity-60 data-[loading]:pointer-events-none">
+    <button 
+      class="border rounded-md w-8 h-8 flex items-center justify-center disabled:opacity-50"
+      data-cart-action="decrease"
+      data-min-amount="${package.stock.min_amount}"
+      ${package.stock.min_amount && package.cart_item.quantity <= package.stock.min_amount ? 'disabled' : ''}
+    >
+      <i data-lucide="minus" class="w-4 h-4"></i>
+    </button>
+
+    <input data-cart-action="input" autocomplete="off" value="${package.cart_item.quantity}" class="w-10 h-8 text-center px-0" />
+
+    <button data-cart-action="increase" class="border rounded-md w-8 h-8 flex items-center justify-center">
+      <i data-lucide="plus" class="w-4 h-4"></i>
+    </button>
+
+    <button data-cart-action="remove" class="border rounded-md w-8 h-8 flex items-center justify-center bg-red-500">
+      <i data-lucide="x" class="w-4 h-4"></i>
+    </button>
+  </div>
+</div>  

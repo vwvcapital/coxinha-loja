@@ -1,0 +1,54 @@
+<% unless store.type == 'STANDALONE' %>
+  <% load "widget", type: "connection_board" %>
+<% endunless %>
+
+<% assign first_category = categories | first %>
+<% assign header_store_url = '/store' %>
+<% if first_category %>
+  <% assign header_store_url = '/category/' | append: first_category.slug %>
+  <% if first_category.hide_subcategory and first_category.sub_categories and first_category.sub_categories.size > 0 %>
+    <% assign first_sub_category = first_category.sub_categories | first %>
+    <% assign header_store_url = '/category/' | append: first_sub_category.slug %>
+  <% endif %>
+<% endif %>
+
+<% assign server_java_ip = 'coxinhasmp.com' %>
+<% assign server_bedrock_ip = 'coxinhasmp.com' %>
+<% assign coxinha_hero_banner = theme.logo %>
+<% if coxinha_hero_banner == blank %>
+  <% assign coxinha_hero_banner = 'public/assets/templates/KOPY/no-image.png' | cdn %>
+<% endif %>
+
+<section class="coxinha-header-wrap" aria-label="Destaque da loja">
+  <div class="store-stage coxinha-header-stage">
+    <section class="rank-banner">
+      <div class="rank-copy">
+        <div class="rank-brand-lockup">
+          <a href="/" class="rank-brand-logo" aria-label="<%= store.name %>">
+            <% if theme.logo != blank %>
+              <img src="<%= theme.logo %>" alt="<%= store.name %>" loading="eager">
+            <% else %>
+              <span>CS</span>
+            <% endif %>
+          </a>
+
+          <button
+            id="server-ip-open"
+            type="button"
+            class="brand-pill server-ip-trigger"
+            aria-haspopup="dialog"
+            onclick="openServerIpDialog('<%= server_java_ip %>', '<%= server_bedrock_ip %>')"
+          >
+            COXINHA<span>SMP.COM</span>
+          </button>
+        </div>
+      </div>
+
+      <% if coxinha_hero_banner != blank %>
+        <div class="rank-render" aria-hidden="true">
+          <img src="<%= coxinha_hero_banner %>" alt="" loading="eager" referrerpolicy="no-referrer">
+        </div>
+      <% endif %>
+    </section>
+  </div>
+</section>

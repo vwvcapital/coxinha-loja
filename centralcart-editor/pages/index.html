@@ -1,0 +1,174 @@
+<% layout "layouts/layout", page_title: 'Loja' %>
+<% load "widget", type: "package_highlight" %>
+
+<section class="store-stage coxinha-category-stage">
+  <% assign home_has_products = false %>
+
+  <% if categories and categories.size > 0 %>
+    <% for category_item in categories %>
+      <% load "packages", category_id: category_item.id, limit: 24, deep: true %>
+
+      <% if packages.data.size > 0 %>
+        <% assign home_has_products = true %>
+
+        <section class="category-product-section home-category-block" id="categoria-<%= category_item.slug %>">
+          <div class="category-section-heading">
+            <div>
+              <h2><%= category_item.name %></h2>
+            </div>
+          </div>
+
+          <div class="product-grid category-products">
+            <% for package in packages.data %>
+              <% assign is_highlighted = widget.package_highlight.id == package.id %>
+              <% assign modal_price = package.pricing.min | default: package.pricing.price %>
+              <% assign dialog_id = 'package-' | append: package.id %>
+              <% assign package_description = package.description | default: package.short_description %>
+              <% assign fallback_product_image = theme.logo | default: 'public/assets/templates/KOPY/no-image.png' %>
+              <% unless fallback_product_image contains 'https://' %><% assign fallback_product_image = fallback_product_image | cdn %><% endunless %>
+              <% assign has_variations = package.is_variation_parent and package.variations.size > 0 %>
+
+              <% centralcart
+                assign display_package = package
+
+                if package.is_variation_parent and package.variations.size > 0
+                  assign first_variation = package.variations | first
+                  assign display_package = first_variation
+                endif
+              centralcart %>
+
+              <div id="dialog-<%= dialog_id %>" class="w-screen h-screen flex items-center justify-center z-50 fixed top-0 left-0 group dialog hidden" data-state="closed">
+                <div class="max-h-[90vh] overflow-auto custom-scrollbar bg-muted w-full rounded-xl lg:w-[600px]">
+                  <div class="p-5 relative">
+                    <div class="flex flex-col space-y-1.5 text-center sm:text-left">
+                      <h2 id="dialog-<%= dialog_id %>-title" class="text-lg font-semibold leading-none tracking-tight"><%= package.name %></h2>
+                    </div>
+
+                    <button type="button" aria-label="Fechar" class="absolute right-4 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full p-1 bg-red-500 hover:bg-red-500/80 text-foreground transition-all" onclick="closeDialog('<%= dialog_id %>')">
+                      <i data-lucide="x" class="size-4 text-background"></i>
+                    </button>
+                  </div>
+                  <div class="p-6 bg-background/60">
+                    <div class="flex flex-col gap-5" data-package-dialog data-package-id="<%= package.id %>" data-has-variations="<% if has_variations %>true<% else %>false<% endif %>">
+                      <% if package_description %>
+                        <div class="max-h-64 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
+                          <div class="text-sm text-muted-foreground leading-relaxed prose prose-invert max-w-none">
+                            <%= package_description %>
+                          </div>
+                        </div>
+                      <% endif %>
+
+                      <% if has_variations %>
+                        <div class="flex flex-col gap-3" data-dialog-variation-container>
+                          <span class="text-sm font-semibold text-muted-foreground">Selecione uma variacao</span>
+                          <div id="variation-list" class="space-y-2 mb-6 max-h-[calc(210px+16px)] overflow-y-auto custom-scrollbar">
+                            <% for variation in package.variations %>
+                              <button type="button" class="group w-full rounded-cc border transition px-4 h-[70px] flex text-start items-center justify-between gap-2 border-white/10 hover:bg-white/5 data-[selected=true]:border-primary/50 data-[selected=true]:bg-primary/20" data-action="select-variation" data-variation-id="<%= variation.id %>" data-variation-slug="<%= variation.slug %>" data-selected="<%= variation.id == display_package.id %>">
+                                <div class="flex items-center gap-4">
+                                  <% if variation.icon %>
+                                    <img src="<%= variation.icon %>" alt="<%= variation.name %>" class="rounded-md size-10 object-cover flex-shrink-0" />
+                                  <% else %>
+                                    <div class="w-4 h-4 border-2 rounded-full flex items-center justify-center border-muted-foreground group-data-[selected=true]:border-primary">
+                                      <div class="w-2 h-2 rounded-full hidden group-data-[selected=true]:block bg-primary"></div>
+                                    </div>
+                                  <% endif %>
+                                  <div class="flex flex-col flex-1">
+                                    <span class="font-medium text-sm line-clamp-1" title="<%= variation.name %>"><%= variation.name %></span>
+                                    <span class="text-xs text-green-500">
+                                      <% if variation.stock.quantity == null %>
+                                        Estoque ilimitado
+                                      <% else %>
+                                        <%= variation.stock.quantity %> em estoque
+                                      <% endif %>
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div class="flex flex-col items-end">
+                                  <% if variation.pricing.compare_at %>
+                                    <span class="text-xs text-muted-foreground line-through"><%= variation.pricing.compare_at | format_price %></span>
+                                  <% endif %>
+                                  <div class="flex items-baseline gap-2">
+                                    <% if variation.pricing.percent_discount %>
+                                      <span class="text-xs text-green-500">-<%= variation.pricing.percent_discount | abs | round %>%</span>
+                                    <% endif %>
+                                    <span class="font-medium"><%= variation.pricing.price | format_price %></span>
+                                  </div>
+                                </div>
+                              </button>
+                            <% endfor %>
+                          </div>
+                          <p class="text-xs font-medium text-amber-400" data-dialog-selection-warning>Escolha uma opcao para continuar.</p>
+                        </div>
+                      <% endif %>
+
+                      <div class="-mx-6 -mb-6 flex items-center justify-between px-6 py-4 gap-4 bg-muted">
+                        <div class="flex flex-col">
+                          <span class="text-sm italic text-muted-foreground font-medium">pague:</span>
+                          <strong class="text-2xl font-black text-primary leading-none" data-dialog-price data-base-price="<%= package.pricing.price | default: modal_price %>" data-base-price-label="<%= modal_price | format_price %><% if has_variations %>+<% endif %>">
+                            <%= modal_price | format_price %><% if has_variations %>+<% endif %>
+                          </strong>
+                        </div>
+
+                        <div class="flex justify-end">
+                          <button type="button" class="btn-primary h-12 px-6 text-base rounded-full" data-package-card-button data-package-id="<%= package.id %>" data-text-default="Comprar" data-text-active="Ver carrinho" data-text-out-of-stock="Sem estoque" data-stock='<%= package.stock.available %>' data-state="default" data-dialog-id="<%= dialog_id %>" data-button-context="dialog" data-has-variations="<% if package.is_variation_parent and package.variations.size > 0 %>true<% else %>false<% endif %>" <% if package.stock.available == false %>disabled<% endif %>>
+                            <i data-lucide="shopping-cart" class="h-5 w-5"></i>
+                            <span data-button-label>Comprar</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <% if has_variations %>
+                        <script type="application/json" data-package-variations="<%= package.id %>"><%= package.variations | json %></script>
+                      <% endif %>
+                      <script type="application/json" data-package-fields="<%= package.id %>"><%= display_package.fields | json %></script>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <script type="application/json" data-package-fields="<%= package.id %>"><%= display_package.fields | json %></script>
+
+              <article class="product-card package-card" data-package-id="<%= package.id %>">
+                <% if package.stock.available == false %>
+                  <span class="product-stock-badge">Esgotado</span>
+                <% elsif is_highlighted %>
+                  <span class="popular-badge">Destaque</span>
+                <% endif %>
+
+                <button type="button" class="product-image-frame" onclick="openDialog('<%= dialog_id %>')" aria-label="Ver detalhes de <%= package.name %>">
+                  <img src="<% if package.image %><%= package.image %><% else %><%= fallback_product_image %><% endif %>" alt="" loading="lazy" <% if package.stock.available == false %>class="is-disabled"<% endif %>>
+                </button>
+
+                <p class="text-2xl product-card-title"><%= package.name %></p>
+
+                <div class="product-card-price-block">
+                  <% if package.pricing.compare_at %>
+                    <p class="price-compare">de <span><%= package.pricing.compare_at | format_price %></span></p>
+                  <% endif %>
+                  <p class="price"><%= modal_price | format_price %><% if package.variations.size > 0 %>+<% endif %></p>
+                </div>
+
+                <div class="card-action-row">
+                  <button type="button" class="cart-button" data-package-card-button data-package-id="<%= package.id %>" data-text-default="Comprar agora" data-text-active="Ver carrinho" data-stock='<%= package.stock.available %>' data-text-out-of-stock="Sem estoque" data-state="default" data-dialog-id="<%= dialog_id %>" data-button-context="card" data-has-variations="<% if package.is_variation_parent and package.variations.size > 0 %>true<% else %>false<% endif %>" <% if package.stock.available == false %>disabled<% endif %>>
+                    <span class="cart-mark" aria-hidden="true"></span>
+                    <span data-button-label>Comprar agora</span>
+                  </button>
+
+                  <button type="button" class="product-info-button" onclick="openDialog('<%= dialog_id %>')" aria-label="Mais detalhes sobre <%= package.name %>">?</button>
+                </div>
+              </article>
+            <% endfor %>
+          </div>
+        </section>
+      <% endif %>
+    <% endfor %>
+  <% endif %>
+
+  <% unless home_has_products %>
+    <div class="coxinha-empty-state">
+      <i data-lucide="box" class="size-6"></i>
+      <p>Nenhum produto encontrado.</p>
+    </div>
+  <% endunless %>
+</section>

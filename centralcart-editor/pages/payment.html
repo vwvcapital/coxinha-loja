@@ -1,0 +1,94 @@
+<% layout "layouts/layout", page_title: 'Pagamento' %>
+
+<section class="container py-8">
+  <div class="space-y-6 max-w-lg mx-auto">
+    <div class="bg-muted border rounded-cc p-5 md:p-6 backdrop-blur-sm overflow-hidden relative">
+
+      <div class="absolute left-0 top-0 w-full h-1 bg-primary/10 border-primary overflow-hidden">
+        <div class="absolute bg-primary animate-[loading_2s_ease-in-out_infinite] w-1/4 inset-y-0">
+        </div>
+      </div>
+
+      <h2 class="text-center font-semibold text-lg">Concluir pagamento</h2>
+      <p class="text-sm text-muted-foreground text-center mt-1">Use a câmera do seu celular para escanear o QR Code.</p>
+
+      <div class="mt-6 flex items-center justify-center">
+        <div class="bg-background border border-white/10 rounded-[calc(var(--radius)+16px)] p-4 flex items-center justify-center w-fit h-fit">
+          <% if order and order.qr_code %>
+            <img src="<%= order.qr_code %>" alt="QR Code PIX" width="230" height="230" class="aspect-square bg-white p-1 rounded-cc" />
+          <% else %>
+            <div class="text-sm text-muted-foreground text-center">QR Code indisponível.</div>
+          <% endif %>
+        </div>
+      </div>
+
+      <div class="mt-6 border-t pt-4">
+        <p class="text-center text-sm text-muted-foreground">Ou use o copia e cola</p>
+
+        <div class="mt-3 flex gap-2 items-center">
+          <input
+            type="text"
+            class="flex-1 h-10 px-3 text-sm bg-background border rounded-cc"
+            readonly
+            value="<%= order.pix_code | default: '' %>"
+          />
+          <button
+            type="button"
+            class="btn-primary h-10 px-4 group"
+            data-action="copy"
+            data-content="<%= order.pix_code %>"
+            data-is-copied="false"
+          >
+            <i data-lucide="check" class="size-4 hidden group-data-[is-copied=true]:block"></i>
+            <i data-lucide="copy" class="size-4 hidden group-data-[is-copied=false]:block"></i>
+            <span class="ml-1 hidden sm:inline">Copiar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div 
+      class="bg-muted border rounded-cc p-5 md:p-6 backdrop-blur-sm overflow-hidden
+      after:content-[''] after:absolute after:inset-0 after:border-s-4 after:border-primary after:w-full after:h-full"
+    >
+      <h3 class="font-semibold text-lg">Como pagar com PIX?</h3>
+      <div class="mt-4 space-y-3">
+        <div class="flex items-start gap-3">
+          <i data-lucide="qr-code" class="size-5 text-primary"></i>
+          <p class="text-sm">Abra o aplicativo do seu banco e escaneie o QR Code acima.</p>
+        </div>
+        <div class="flex items-start gap-3">
+          <i data-lucide="copy" class="size-5 text-primary"></i>
+          <p class="text-sm">Copie o código Pix e cole no aplicativo do seu banco.</p>
+        </div>
+        <div class="flex items-start gap-3">
+          <i data-lucide="check-circle-2" class="size-5 text-primary"></i>
+          <p class="text-sm">Após o pagamento, o pedido será processado automaticamente.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const ORDER_ID = "<%= order.internal_id %>";
+  (function () {
+    const orderId = ORDER_ID;
+
+    async function checkStatus() {
+      try {
+        const res = await CentralCart.getOrderStatus(orderId);
+        const data = res && res.data ? res.data : null;
+        const status = (data && (data.status || (data.order && data.order.status))) || null;
+        if (status && status !== 'PENDING') {
+          window.location.href = '/order/' + orderId;
+        }
+      } catch (e) {
+        // ignore errors and try again
+      }
+    }
+
+    checkStatus();
+    setInterval(checkStatus, 5000);
+  })();
+  </script>

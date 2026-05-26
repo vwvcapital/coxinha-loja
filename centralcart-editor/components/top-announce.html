@@ -1,0 +1,23 @@
+<% if config.top_announce != blank %>
+  <% assign top_announce = config.top_announce | replace: '[','<span class="font-semibold bg-background px-1.5 py-0.5 rounded">' | replace: ']' , '</span>' %>
+  <% if config.top_announce_link %>
+    <a id="top-announce"
+      class="text-center text-sm sm:text-base w-full bg-primary p-2 flex items-center justify-center gap-3 relative z-10"
+      <% if config.top_announce_link != blank %> href="<%= config.top_announce_link %>" <% endif %>
+    >
+      <p class="font-medium">
+        <%= top_announce %>
+      </p>
+    </a>
+
+    <% if config.top_announce_link != blank %>
+      <script>
+        const top_announce_el = document.getElementById('top-announce')
+        if (top_announce_el) {
+          const target = new URL(top_announce_el.href).host === window.location.host ? '_self' : '_blank'
+          top_announce_el.setAttribute('target', target)
+        }
+      </script>
+    <% endif %>
+  <% endif %>
+<% endif %>

@@ -1,0 +1,25 @@
+<div class="flex flex-col sm:flex-row sm:items-center gap-3" data-package-id="${package.id}">
+  <div class="flex items-center gap-3 flex-1">
+    <div class="size-12 rounded-cc border bg-background overflow-hidden flex items-center justify-center">
+      ${
+        package.image
+          ? `<img src="${package.image}" class="size-full object-cover" />`
+          : `<i data-lucide="package" class="size-5 opacity-70"></i>`
+      }
+    </div>
+    <div class="flex-1">
+      <div class="text-sm font-medium">${package.name}</div>
+      <div class="text-xs text-muted-foreground">${CentralCart.formatPrice(package.pricing.price, store.currency)}</div>
+    </div>
+  </div>
+  
+  <div class="flex items-center justify-between sm:justify-end gap-3 flex-wrap">
+    <div class="flex items-center gap-2" data-controls>
+      <button type="button" class="border rounded-cc size-8 grid place-items-center" data-cart-action="decrease"><i data-lucide="minus" class="size-4"></i></button>
+      <input type="text" class="w-12 h-8 text-center" value="${package.cart_item.quantity}" data-cart-action="input" />
+      <button type="button" class="border rounded-cc size-8 grid place-items-center" data-cart-action="increase"><i data-lucide="plus" class="size-4"></i></button>
+      <button type="button" class="border rounded-cc size-8 grid place-items-center bg-red-500/10 text-red-500" data-cart-action="remove"><i data-lucide="x" class="size-4"></i></button>
+    </div>
+    <div class="w-24 text-end font-medium max-[342px]:w-auto">${CentralCart.formatPrice(package.pricing.price * package.cart_item.quantity, store.currency)}</div>
+  </div>
+</div>

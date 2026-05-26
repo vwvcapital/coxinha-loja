@@ -1,0 +1,11 @@
+<% assign open_package = query.open | to_integer %>
+<% if open_package and open_package > 0 %>
+  <% load "packages", id: open_package %>
+  <% assign package = packages.data | first %>
+  <% if package %>
+    <% assign modal_price=package.pricing.min | default: package.pricing.price %>
+    <% assign dialog_id='package-' | append: package.id %>
+    <% assign package_description=package.description | default: package.short_description %>
+    <% render 'components/package-dialog' , package: package, package_description: package_description, modal_price:modal_price, dialog_id: dialog_id %>
+  <% endif %>
+<% endif %>

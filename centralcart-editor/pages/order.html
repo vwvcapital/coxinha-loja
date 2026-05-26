@@ -1,0 +1,183 @@
+<% layout "layouts/layout", page_title: 'Pedido', robots: 'noindex, nofollow' %>
+
+<% load "checkout_fields" %>
+
+<main class="grid grid-cols-1 md:grid-cols-2 container mx-auto max-w-screen-lg min-h-[70vh] gap-6 py-8">
+  <section class="flex-1">
+    <div>
+      <nav aria-label="breadcrumb" class="text-sm mt-4 text-muted-foreground">
+        <ol class="flex items-center gap-1.5">
+          <li><a href="/" class="hover:underline">Início</a></li>
+          <li><i data-lucide="chevron-right" class="size-4"></i></li>
+          <li class="font-semibold text-foreground">Detalhes do pedido</li>
+        </ol>
+      </nav>
+    </div>
+
+    <div class="mt-8 space-y-6">
+      <h2 class="text-lg font-semibold">Itens do pedido</h2>
+
+      <div class="space-y-4">
+        <% if order.packages %>
+          <% for pkg in order.packages %>
+          
+            <% assign pkg_deliveries = order.deliveries | where: 'order_package_id', pkg.id %>
+            <% capture content %>
+              <% render 'components/order-item-content', pkg_deliveries: pkg_deliveries %>
+            <% endcapture %>
+
+            <% assign dialog_id = 'redeem-' | append: pkg.id %>
+            <% render 'components/dialog', id: dialog_id, title: pkg.name, content: content, width: '600px' %>
+          
+            <div class="flex gap-3 items-center border rounded-cc p-3 bg-muted backdrop-blur-sm">
+              <div class="relative w-16 h-16">
+                <img class="size-full bg-background border rounded-md object-cover"
+                     src="<% if pkg.meta and pkg.meta.image %><%= pkg.meta.image %><% else %><%= 'public/assets/templates/KOPY/no-image.png' | cdn %><% endif %>" />
+                <span class="absolute -top-2 -right-2 bg-primary text-background font-semibold w-6 h-6 rounded-full grid place-items-center text-xs">
+                  <%= pkg.quantity | default: 1 %>
+                </span>
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <% assign pkg_name = pkg.meta.name | default: 'Pacote' %>
+                <p class="text-sm font-medium line-clamp-2" title="<%= pkg.meta.name | default: '' %>">
+                  <%= pkg_name %>
+                </p>
+                <% assign pkg_price = pkg.price | default: pkg.meta.price %>
+                <p class="text-xs text-muted-foreground">
+                  <%= pkg_price | format_price %>
+                </p>
+              </div>
+
+              <% if store.type != 'STANDALONE' %>
+                <div class="bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 px-2 py-1 text-xs rounded-md font-medium">
+                  Entregue in‑game
+                </div>
+              <% endif %>
+
+              <% if store.type == 'STANDALONE' and order.deliveries %>
+                <% if pkg_deliveries and pkg_deliveries.size > 0 %>
+                  <button type="button" class="btn-primary h-8 px-3" onclick="openDialog('redeem-<%= pkg.id %>')">Resgatar</button>
+                <% endif %>
+              <% endif %>
+            </div>
+          <% endfor %>
+        <% else %>
+          <p class="text-sm text-muted-foreground">Nenhum item encontrado neste pedido.</p>
+        <% endif %>
+      </div>
+
+      <% if chat_delivery and order.status == 'APPROVED' %>
+        <div class="mt-8">
+          <h2 class="text-lg font-semibold mb-4">Entrega do produto</h2>
+          <% render 'components/chat-delivery', chat_delivery: chat_delivery, order: order %>
+        </div>
+        <script src="/scripts/chat.js?v=cdn-clear-20260526-1025"></script>
+      <% endif %>
+
+      <a href="/" class="btn-primary h-10 mt-4 inline-flex items-center gap-2 w-fit">
+        <i data-lucide="home" class="size-5"></i>
+        Voltar ao início
+      </a>
+    </div>
+  </section>
+
+  <section class="flex-1">
+    <p class="text-lg font-medium">Detalhes do pedido</p>
+
+    <% assign status_icon = 'clock' %>
+    <% assign status_color = 'text-yellow-500' %>
+    <% assign status_label = 'Pagamento pendente' %>
+    <% case order.status %>
+      <% when 'APPROVED' %>
+        <% assign status_icon = 'check-circle-2' %>
+        <% assign status_color = 'text-emerald-500' %>
+        <% assign status_label = 'Pagamento aprovado!' %>
+      <% when 'REJECTED' %>
+        <% assign status_icon = 'x-circle' %>
+        <% assign status_color = 'text-red-500' %>
+        <% assign status_label = 'Pagamento rejeitado' %>
+      <% when 'CANCELED' %>
+        <% assign status_icon = 'x-circle' %>
+        <% assign status_color = 'text-red-500' %>
+        <% assign status_label = 'Pagamento cancelado' %>
+      <% when 'REFUNDED' %>
+        <% assign status_icon = 'rotate-ccw' %>
+        <% assign status_color = 'text-yellow-500' %>
+        <% assign status_label = 'Pagamento reembolsado' %>
+      <% when 'CHARGEDBACK' %>
+        <% assign status_icon = 'rotate-ccw' %>
+        <% assign status_color = 'text-purple-500' %>
+        <% assign status_label = 'Pagamento contestado' %>
+    <% endcase %>
+
+    <div class="mt-6 border py-4 rounded-cc flex flex-col gap-2 bg-muted backdrop-blur-sm">
+      <div class="px-4">
+        <div class="flex items-center gap-2">
+          <i data-lucide="<%= status_icon %>" class="size-5 <%= status_color %>"></i>
+          <h2 class="font-semibold"><%= status_label %></h2>
+        </div>
+        <p class="text-sm text-muted-foreground">Atualizado em <%= order.created_at | date: '%d/%m/%Y às %H:%M' %></p>
+      </div>
+
+      <div class="flex items-center justify-between h-4">
+        <div class="detail-dash"></div>
+      </div>
+
+      <div class="px-4 space-y-4">
+        <div class="space-y-1">
+          <label class="">Nome</label>
+          <input class="w-full h-10" readonly value="<%= order.client_name %>" />
+        </div>
+
+        <div class="space-y-1">
+          <label class="">Email</label>
+          <input class="w-full h-10" readonly value="<%= order.client_email %>" />
+        </div>
+
+        <% assign client_identifier = order.variables | where: "name", "client_identifier" | first %>
+        <% assign variable = checkout_fields | where: "name", "client_identifier" | first %>
+        <% if client_identifier %>
+          <div class="space-y-1">
+            <label><%= variable.label | default: variable.description %></label>
+            <input class="w-full h-10" readonly value="<%= client_identifier.value %>" />
+          </div>
+        <% endif %>
+      </div>
+
+      <div class="flex items-center justify-between h-4">
+        <div class="detail-dash"></div>
+      </div>
+
+      <div class="px-4 space-y-4">
+        <div class="space-y-1">
+          <label class="">Nº do pedido</label>
+          <input class="w-full h-10" readonly value="<%= order.internal_id %>" />
+        </div>
+
+        <% if order.promo_code %>
+          <div class="space-y-1">
+            <label class="">Cupom</label>
+            <input class="w-full h-10" readonly value="<%= order.promo_code %>" />
+          </div>
+        <% endif %>
+      </div>
+
+      <div class="flex items-center justify-between h-4">
+        <div class="detail-dash"></div>
+      </div>
+
+      <div class="px-4 flex justify-between items-center">
+        <div>
+          <label class="text-muted-foreground">Pago com</label>
+          <p class="font-semibold"><%= order.gateway_display %></p>
+        </div>
+        <div class="text-right">
+          <label class="text-muted-foreground">Valor total</label>
+          <p class="font-semibold"><%= order.price_display %></p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+

@@ -1,0 +1,117 @@
+<% if query.bar == 'true' %>
+  <% if packages.data.size == 0 %>
+    <p class="p-4 text-sm">Nenhum produto encontrado.</p>
+  <% else %>
+    <div class="divide-y divide-white/10">
+      <% for package in packages.data %>
+        <% centralcart
+          assign package_category = null
+
+          for category in categories
+            if category.id == package.category_id
+              assign package_category = category
+            endif
+          
+            if category.sub_categories
+              for sub_category in category.sub_categories
+                if sub_category.id == package.category_id
+                  assign package_category = sub_category
+                  break
+                endif
+              endfor
+            endif
+          endfor
+        centralcart %>
+
+        <% centralcart
+          assign package_link = '#'
+          
+          if package_category and package_category.slug
+            assign package_id = package.parent_id | default: package.id
+            assign package_link = '/category/' | append: package_category.slug | append: '?open=' | append: package_id
+          endif
+        centralcart %>
+
+        <a href="<%= package_link %>" class="p-4 flex justify-between items-center transition-all hover:bg-white/10">
+          <div class="flex gap-2 items-center w-full">
+            <% if package.image %>
+              <img src="<%= package.image %>" class="size-16 object-cover rounded-lg" />
+            <% else %>
+              <img src="<%= 'public/assets/templates/KOPY/no-image.png' | cdn %>" class="size-16 object-cover rounded-lg" />
+            <% endif %>
+            <div class="flex flex-col gap-1">
+              <p class="font-semibold line-clamp-1"><%= package.name %></p>
+              <p class="line-clamp-1 bg-primary/20 border border-primary w-fit px-1 py-0.5 rounded-[calc(var(--radius)-4px)] uppercase text-xs">
+                <% if package_category %>
+                  <%= package_category.name %>
+                <% else %>
+                  Sem categoria
+                <% endif %>
+              </p>
+            </div>
+            <p class="text-primary font-bold ml-auto">
+              <%= package.pricing.price | format_price %>
+            </p>
+          </div>
+        </a>
+
+      <% endfor %>
+    </div>
+  <% endif %>
+
+<% elsif query.package_list == 'true' %>
+  <% for package in packages.data %>
+    <% centralcart
+      assign index = forloop.index0
+      assign delay = index | modulo: 5 | times: 0.15
+    centralcart %>
+
+    <div class="reveal-fade-up" style="--delay: <%= delay %>s;">
+      <% render "components/package-card", package: package %>
+    </div>
+  <% endfor %>
+
+<% elsif query.current_package != 'null' %>
+  <% centralcart 
+    assign current_id_str = query.current_package | to_integer
+    assign similar_packages = packages.data | reject: 'id', current_id_str
+    assign similar_count = similar_packages.size
+  centralcart %>
+
+  <% if similar_count > 0 %>
+    <section class="container mt-12 reveal-fade-up">
+      <div class="flex items-center justify-between">
+        <h4 class="text-lg font-semibold leading-5">Produtos similares</h4>
+
+        <% if similar_count > 5 %>
+          <div class="flex items-center gap-2">
+            <button 
+              id="similar-slider-prev" 
+              class="active:scale-90 w-8 h-8 flex items-center 
+              justify-center rounded-lg border bg-background hover:bg-foreground/10 transition"
+            >
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <button 
+              id="similar-slider-next" 
+              class="active:scale-90 w-8 h-8 flex items-center 
+              justify-center rounded-lg border bg-background hover:bg-foreground/10 transition"
+            >
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        <% endif %>
+      </div>
+
+      <div id="similar-packages-slider" class="mt-4 keen-slider rounded-lg">
+        <% for package in packages.data %>
+          <% unless package.id == query.current_package %>
+            <div class="keen-slider__slide">
+              <% render "components/package-card", package: package, is_similar_preview: true %>
+            </div>
+          <% endunless %>
+        <% endfor %>
+      </div>
+    </section>
+  <% endif %>
+<% endif %>

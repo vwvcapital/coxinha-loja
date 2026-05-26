@@ -1,0 +1,52 @@
+<% if package.is_variation_parent and package.variations.size > 0 %>
+  <div id="variation-list" class="space-y-2 mb-6 max-h-[calc(210px+16px)] overflow-y-auto custom-scrollbar">
+    <% for variation in package.variations %>
+      <button 
+        type="button"
+        class="group w-full rounded-cc border transition px-4 h-[70px] flex text-start items-center justify-between 
+        gap-2 border-white/10 hover:bg-white/5 data-[selected=true]:border-primary/50 data-[selected=true]:bg-primary/20"
+        data-action="select-variation"
+        data-variation-id="<%= variation.id %>"
+        data-variation-slug="<%= variation.slug %>"
+        data-selected="<%= variation.id == display_package.id %>"
+      >
+        <div class="flex items-center gap-4">
+          <% if variation.icon %>
+            <img src="<%= variation.icon %>" alt="<%= variation.name %>" class="rounded-md size-10 object-cover flex-shrink-0" />
+          <% else %>
+            <div class="w-4 h-4 border-2 rounded-full flex items-center justify-center border-muted-foreground group-data-[selected=true]:border-primary">
+              <div class="w-2 h-2 rounded-full hidden group-data-[selected=true]:block bg-primary"></div>
+            </div>
+          <% endif %>
+          <div class="flex flex-col flex-1">
+            <span class="font-medium text-sm line-clamp-1" title="<%= variation.name %>"><%= variation.name %></span>
+            <span class="text-xs text-green-500">
+              <% if variation.stock.quantity == null %>
+                Estoque ilimitado
+              <% else %>
+                <%= variation.stock.quantity %> em estoque
+              <% endif %>
+            </span>
+          </div>
+        </div>
+
+        <div class="flex flex-col items-end">
+          <% if variation.pricing.compare_at %>
+            <span class="text-xs text-muted-foreground line-through">
+              <%= variation.pricing.compare_at | format_price %>
+            </span>
+          <% endif %>
+          <div class="flex items-baseline gap-2">
+            <% if variation.pricing.percent_discount %>
+              <span class="text-xs text-green-500">-<%= variation.pricing.percent_discount | abs | round %>%</span>
+            <% endif %>
+
+            <span class="font-medium">
+              <%= variation.pricing.price | format_price %>
+            </span>
+          </div>
+        </div>
+      </button>
+    <% endfor %>
+  </div>
+<% endif %>
