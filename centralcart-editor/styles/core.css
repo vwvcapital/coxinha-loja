@@ -1476,12 +1476,65 @@ html.page-motion-prep .rank-render {
 }
 
 .price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
   margin: 0;
   color: #d8d8d8;
   font-size: 1.08rem;
   font-weight: 900;
   line-height: 1;
   letter-spacing: 0;
+  text-shadow: 0 2px 0 #000;
+}
+
+.price-period-badge {
+  display: inline-grid;
+  min-height: 18px;
+  place-items: center;
+  border: 1px solid rgba(255, 195, 58, 0.38);
+  border-radius: 5px;
+  background: rgba(255, 159, 22, 0.14);
+  color: var(--accent-bright);
+  font-family: var(--minecraft-font);
+  font-size: 0.58rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  padding: 3px 5px 2px;
+  text-shadow: 0 2px 0 #000;
+}
+
+.price-monthly {
+  margin: -1px 0 0;
+  color: #fff;
+  font-family: var(--minecraft-font);
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.15;
+  text-shadow: 0 2px 0 #000;
+}
+
+.dialog-period-price,
+.dialog-monthly-price {
+  margin-top: 4px;
+  line-height: 1.2;
+}
+
+.dialog-period-price {
+  color: #aaa;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.dialog-monthly-price {
+  color: var(--accent-bright);
+  font-family: var(--minecraft-font);
+  font-size: 0.76rem;
+  font-style: normal;
+  font-weight: 400;
   text-shadow: 0 2px 0 #000;
 }
 

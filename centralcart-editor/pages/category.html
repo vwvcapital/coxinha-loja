@@ -15,6 +15,19 @@
         <% for package in packages.data %>
           <% assign is_highlighted = widget.package_highlight.id == package.id %>
           <% assign modal_price = package.pricing.min | default: package.pricing.price %>
+          <% assign package_id_text = package.id | append: '' %>
+          <% assign package_period_days = '' %>
+          <% assign package_month_divisor = 0 %>
+          <% if package_id_text == '557586' %>
+            <% assign package_period_days = '60' %>
+            <% assign package_month_divisor = 2 %>
+          <% elsif package_id_text == '557587' %>
+            <% assign package_period_days = '90' %>
+            <% assign package_month_divisor = 3 %>
+          <% endif %>
+          <% if package_month_divisor > 0 %>
+            <% assign package_monthly_price = modal_price | divided_by: package_month_divisor %>
+          <% endif %>
           <% assign dialog_id = 'package-' | append: package.id %>
           <% assign package_description = package.description | default: package.short_description %>
           <% assign fallback_product_image = theme.logo | default: 'public/assets/templates/KOPY/no-image.png' %>
@@ -101,6 +114,10 @@
                       <strong class="text-2xl font-black text-primary leading-none" data-dialog-price data-base-price="<%= package.pricing.price | default: modal_price %>" data-base-price-label="<%= modal_price | format_price %><% if has_variations %>+<% endif %>">
                         <%= modal_price | format_price %><% if has_variations %>+<% endif %>
                       </strong>
+                      <% if package_month_divisor > 0 %>
+                        <span class="dialog-period-price">Acesso por <%= package_period_days %> dias</span>
+                        <span class="dialog-monthly-price"><%= package_monthly_price | format_price %>/mês equivalente</span>
+                      <% endif %>
                     </div>
 
                     <div class="flex justify-end">
@@ -122,7 +139,6 @@
 
           <script type="application/json" data-package-fields="<%= package.id %>"><%= display_package.fields | json %></script>
 
-          <% assign package_id_text = package.id | append: '' %>
           <article class="product-card package-card" data-package-id="<%= package.id %>">
             <% if package.stock.available == false %>
               <span class="product-stock-badge">Esgotado</span>
@@ -144,7 +160,15 @@
               <% elsif package.pricing.compare_at %>
                 <p class="price-compare">de <span><%= package.pricing.compare_at | format_price %></span></p>
               <% endif %>
-              <p class="price"><%= modal_price | format_price %><% if package.variations.size > 0 %>+<% endif %></p>
+              <p class="price">
+                <span><%= modal_price | format_price %><% if package.variations.size > 0 %>+<% endif %></span>
+                <% if package_month_divisor > 0 %>
+                  <span class="price-period-badge"><%= package_period_days %> dias</span>
+                <% endif %>
+              </p>
+              <% if package_month_divisor > 0 %>
+                <p class="price-monthly"><%= package_monthly_price | format_price %>/mês equivalente</p>
+              <% endif %>
             </div>
 
             <div class="card-action-row">
