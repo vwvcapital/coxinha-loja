@@ -927,6 +927,10 @@ html.page-motion-prep .rank-render {
   filter: drop-shadow(24px 24px 0 rgba(0, 0, 0, 0.18)) drop-shadow(0 24px 34px rgba(0, 0, 0, 0.28));
   transform: translateY(-50%) rotate(7deg);
   transform-origin: 50% 54%;
+  transition:
+    filter 420ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, filter;
 }
 
 @media (min-width: 701px) {
@@ -940,6 +944,13 @@ html.page-motion-prep .rank-render {
   width: auto;
   max-width: none;
   height: 100%;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 701px) {
+  .rank-banner:hover .rank-render {
+    filter: drop-shadow(28px 28px 0 rgba(0, 0, 0, 0.16)) drop-shadow(0 30px 42px rgba(0, 0, 0, 0.34));
+    transform: translateY(calc(-50% - 10px)) rotate(4deg) scale(1.045);
+  }
 }
 
 .mobile-store-header {
