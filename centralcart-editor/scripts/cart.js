@@ -1,4 +1,5 @@
 let initCalc = false;
+let lastCartNavbarCount = null;
 
 const cartDrawer = document.getElementById('cart-drawer');
 
@@ -137,12 +138,26 @@ function initCartActionListeners(container) {
 function updateCartBadge() {
   if (document.body.classList.contains('checkout-page')) return;
   const count = Cart.getCount();
+  const shouldAnimateCartNavbar = count > 0 && (lastCartNavbarCount === null || lastCartNavbarCount < 1);
   const cartButtons = document.querySelectorAll('.open-cart');
   const navbars = document.querySelectorAll('.cart-navbar');
 
   navbars.forEach((navbar) => {
     navbar.classList.toggle('cart-empty', count < 1);
     navbar.classList.toggle('cart-has-items', count > 0);
+
+    if (!navbar.classList.contains('coxinha-nav-actions')) return;
+
+    if (count < 1) {
+      navbar.classList.remove('cart-enter', 'cart-pulse');
+      return;
+    }
+
+    if (shouldAnimateCartNavbar) {
+      navbar.classList.remove('cart-enter');
+      void navbar.offsetWidth;
+      navbar.classList.add('cart-enter');
+    }
   });
 
   cartButtons.forEach((cartButton) => {
@@ -165,6 +180,8 @@ function updateCartBadge() {
       cartButton.appendChild(badge);
     }
   });
+
+  lastCartNavbarCount = count;
 }
 
 window.addEventListener('load', () => {

@@ -167,14 +167,6 @@ function closeServerIpDialog() {
     dialog.classList.add('hidden');
     dialog.dataset.state = 'closed';
     document.body.classList.remove('server-ip-modal-open');
-
-    if (dialog.__returnFocus && typeof dialog.__returnFocus.focus === 'function') {
-      try {
-        dialog.__returnFocus.focus({ preventScroll: true });
-      } catch (_) {}
-    }
-
-    dialog.__returnFocus = null;
   };
 
   const modal = dialog.querySelector('.server-ip-modal');
@@ -204,7 +196,6 @@ function openServerIpDialog(javaIp = '', bedrockIp = '') {
   const dialog = getServerIpDialog();
   const scrollX = window.scrollX || window.pageXOffset || 0;
   const scrollY = window.scrollY || window.pageYOffset || 0;
-  dialog.__returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   window.clearTimeout(dialog.__closeTimer);
 
   dialog.innerHTML = `
@@ -254,12 +245,11 @@ function openServerIpDialog(javaIp = '', bedrockIp = '') {
     });
   });
 
-  dialog.dataset.state = 'opening';
+  dialog.dataset.state = 'open';
   dialog.classList.remove('hidden');
   document.body.classList.add('server-ip-modal-open');
 
   requestAnimationFrame(() => {
-    dialog.dataset.state = 'open';
     try {
       window.scrollTo(scrollX, scrollY);
     } catch (_) {}
@@ -271,7 +261,6 @@ function openServerIpDialog(javaIp = '', bedrockIp = '') {
 
   window.setTimeout(() => {
     try {
-      dialog.querySelector('[data-server-ip-close]')?.focus({ preventScroll: true });
       window.scrollTo(scrollX, scrollY);
     } catch (_) {}
   }, 80);
@@ -400,7 +389,6 @@ function initPageEntranceMotion() {
     { selector: '.rank-render', step: 2, style: 'art', scale: 0.68 },
     { selector: '.mobile-store-header', step: 1, style: 'hero', scale: 0.82 },
     { selector: '.category-sidebar', step: 3, style: 'nav', scale: 0.86 },
-    { selector: '.cart-navbar', step: 4, style: 'nav', scale: 0.86 },
     { selector: '.category-section-heading', step: 5, style: 'section', scale: 0.84 },
     { selector: '.product-card', step: 6, style: 'card', scale: 0.72, stagger: 42, limit: 24 },
     { selector: '.faq-item', step: 6, style: 'card', scale: 0.78, stagger: 48, limit: 16 },
